@@ -1,6 +1,6 @@
-- 名称:文档  
+- name: 文档  
   href: articles/toc.yml  
   topicHref: articles/index.md
-- 名称:API
+- name: API
   href: api/toc.yml
   topicHref: api/index.md

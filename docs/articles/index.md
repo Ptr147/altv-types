@@ -1,13 +1,13 @@
-# Getting Started
+# 入门
 
-This is the documentation for getting started with developing JS resources.
+这是开始开发JS资源的文档。
 
-Read [Setup](setup.md) for setting up alt:V.
+阅读[设置](setup.md)以设置alt:V。  
 
-Read [Create Resource](create-your-first-resource.md) for information on how to create your first JS resource.
+阅读[创建资源](create-your-first-resource.md)以了解如何创建您的第一个JS资源。
 
-Read [Understanding Events](events/index.md) for an introduction on handling alt:V events.
+阅读[理解事件](events/index.md)以了解处理alt:V事件的介绍。
 
-Read [Player](player/index.md) for an introduction to the player.
+阅读[玩家](player/index.md)以了解玩家入门知识。  
 
-Read [Snippets](snippets/index.md) for useful snippets.
+阅读[片段](snippets/index.md)以获取有用的代码片段。

@@ -1,54 +1,53 @@
-- name: Getting Started
-  href: index.md
-  items:
-    - name: Setup
+- name: 入门  
+  href: index.md  
+  items:  
+    - name: 设置  
       href: setup.md
-    - name: Create your first resource
-      href: create-your-first-resource.md
-    - name: Local storage
+    - name: 创建你的第一个资源
+      href: create-your-first-resource.md 
+    - name: 本地存储
       href: localstorage.md
-    - name: Import assertions
+    - name: 导入断言  
       href: import-assertions.md
-- name: Events
-  href: events/index.md
-  items:
-    - name: beforePlayerConnect
+- name: 事件  
+  href: events/index.md  
+  items:  
+    - name: beforePlayerConnect  
       href: events/before-player-connect.md
-- name: Player
-  href: player/index.md
-  items:
-    - name: Player Server Props
+- name: 玩家  
+  href: player/index.md  
+  items:  
+    - name: 玩家服务器属性  
       href: player/server-player-props.md
-    - name: Player Server Functions
+    - name: 玩家服务器函数  
       href: player/server-player-funcs.md
-    - name: Local Player ScriptID
+    - name: 本地玩家脚本ID  
       href: player/player-script-id.md
-- name: Snippets
-  href: snippets/index.md
-  items:
-    - name: Encryption
+- name: 片段  
+  href: snippets/index.md  
+  items:  
+    - name: 加密  
       href: snippets/encryption.md
-    - name: Help Text
+    - name: 帮助文本  
       href: snippets/helptext.md
-    - name: Markers
+    - name: 标记  
       href: snippets/markers.md
-    - name: Math & Distance
+    - name: 数学 与 距离  
       href: snippets/math.md
-    - name: Notifications
+    - name: 通知  
       href: snippets/notifications.md
-    - name: Prototyping
-      href: snippets/prototyping.md
-    - name: Shuffle
+    - name: 原型  
+      href: snippets/prototyping.md 
+    - name: 数组洗牌  
       href: snippets/shuffle.md
-    - name: Text Labels
+    - name: 文本标签  
       href: snippets/textlabels.md
-    - name: Voice
+    - name: 语音  
       href: snippets/voice.md
-- name: Vehicle
-  href: vehicle/index.md
-  items:
-    - name: Train API
-      href: vehicle/train-api.md
+- name: 车辆  
+  href: vehicle/index.md  
+  items:  
+    - name: 列车API  
+      href: vehicle/train-api.md  
 - name: Workers
   href: workers.md
-

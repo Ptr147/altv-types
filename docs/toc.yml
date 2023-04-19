@@ -1,6 +1,6 @@
-- name: Documentation
-  href: articles/toc.yml
+- 名称:文档  
+  href: articles/toc.yml  
   topicHref: articles/index.md
-- name: API
+- 名称:API
   href: api/toc.yml
   topicHref: api/index.md

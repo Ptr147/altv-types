@@ -1,6 +1,6 @@
-# alt:V JS module
+# alt:V JS 模块
 
-## Overview
+## 概述
 <section class="destinations">
   <div class="grid-container">
     <div class="grid-item">
@@ -11,11 +11,11 @@
         <div class="card-content">
           <a href="alt-client.yml" class="card-header">
             <span>
-              Client-side API
+              客户端 API
             </span>
           </a>
           <p class="card-description">
-            Get to know our powerful client-side scripting API.
+            了解我们强大的客户端脚本API。
           </p>
         </div>
       </div>
@@ -28,11 +28,11 @@
         <div class="card-content">
           <a href="alt-server.yml" class="card-header">
             <span>
-              Server-side API
+              服务端 API
             </span>
           </a>
           <p class="card-description">
-            Get to know our powerful server-side scripting API.
+            了解我们强大的服务器端脚本API。
           </p>
         </div>
       </div>

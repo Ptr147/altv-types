@@ -1199,6 +1199,22 @@ declare module "alt-shared" {
   }
 
   /**
+   * Documentation: https://docs.altv.mp/articles/configs/resource.html
+   */
+  export interface IResourceConfig {
+    readonly type?: string;
+    readonly deps?: ReadonlyArray<string>;
+    readonly main?: string;
+    readonly "client-main"?: string;
+    readonly "client-type"?: string;
+    readonly "client-files"?: ReadonlyArray<string>;
+    readonly "required-permissions"?: ReadonlyArray<shared.Permission>;
+    readonly "optional-permissions"?: ReadonlyArray<shared.Permission>;
+
+    readonly [key: string]: unknown;
+  }
+
+  /**
    * This is an internal utility type and you probably don't need it
    *
    * Returns the value by the key in the interface or `unknown` by default
@@ -1303,11 +1319,18 @@ declare module "alt-shared" {
   export interface ICustomBaseObjectMeta {}
 
   /**
+   * Extend it by interface merging for use in baseobject synced meta {@link BaseObject#getSyncedMeta}, {@link BaseObject#hasSyncedMeta}, etc.
+   *
+   * @remarks See {@link "alt-shared".ICustomGlobalMeta} for an example of use.
+   */
+  export interface ICustomBaseObjectSyncedMeta {}
+
+  /**
    * Extend it by interface merging for use in entity synced meta (class `Entity` on client & server, e.g. `entity.getSyncedMeta`)
    *
    * @remarks See {@link ICustomGlobalMeta} for an example of use
    */
-  export interface ICustomBaseObjectSyncedMeta {}
+  export interface ICustomEntitySyncedMeta extends ICustomBaseObjectSyncedMeta {}
 
   /**
    * Extend it by interface merging for use in entity stream synced meta (class `Entity` on client & server, e.g. `entity.getStreamSyncedMeta`)
@@ -1315,6 +1338,13 @@ declare module "alt-shared" {
    * @remarks See {@link ICustomGlobalMeta} for an example of use
    */
   export interface ICustomEntityStreamSyncedMeta {}
+
+  /**
+   * Extend it by interface merging for use in player synced meta (class `Player` on client & server, e.g. `player.getSyncedMeta`)
+   *
+   * @remarks See {@link ICustomGlobalMeta} for an example of use
+   */
+  export interface ICustomPlayerSyncedMeta extends ICustomEntitySyncedMeta {}
 
   /**
    * Extend it by interface merging for use in player stream synced meta (class `Player` on client & server, e.g. `player.getStreamSyncedMeta`)
@@ -1329,6 +1359,13 @@ declare module "alt-shared" {
    * @remarks See {@link ICustomGlobalMeta} for an example of use
    */
   export interface ICustomPlayerLocalMeta {}
+
+  /**
+   * Extend it by interface merging for use in player synced meta (class `Player` on client & server, e.g. `player.getSyncedMeta`)
+   *
+   * @remarks See {@link ICustomGlobalMeta} for an example of use
+   */
+  export interface ICustomVehicleSyncedMeta extends ICustomEntitySyncedMeta {}
 
   /**
    * Extend it by interface merging for use in vehicle stream synced meta (class `Vehicle` on client & server, e.g. `vehicle.getStreamSyncedMeta`)
@@ -1988,13 +2025,6 @@ declare module "alt-shared" {
     public setMeta<V extends any, K extends string = string>(key: K, value: InterfaceValueByKey<ICustomBaseObjectMeta, K, V>): void;
 
     /**
-     * Returns the ref count of the entity.
-     *
-     * @remarks It's only available in debug-mode.
-     */
-    public readonly refCount: number;
-
-    /**
      * Gets a value using the specified key.
      *
      * @param key The key of the value to get.
@@ -2015,6 +2045,13 @@ declare module "alt-shared" {
     public hasSyncedMeta<K extends ExtractStringKeys<ICustomBaseObjectSyncedMeta>>(key: K): boolean;
 
     public getSyncedMetaKeys(): ReadonlyArray<string>;
+
+    /**
+     * Returns the ref count of the entity.
+     *
+     * @remarks It's only available in debug-mode.
+     */
+    public readonly refCount: number;
   }
 
   /**
@@ -2337,6 +2374,7 @@ declare module "alt-shared" {
     public readonly optionalPermissions: ReadonlyArray<Permission>;
     public readonly valid: boolean;
 
+    public readonly config: IResourceConfig;
     public static getByName(name: string): Resource | null;
     public static readonly all: ReadonlyArray<Resource>;
     public static readonly current: Resource;

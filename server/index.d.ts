@@ -563,22 +563,6 @@ declare module "alt-server" {
   }
 
   /**
-   * Documentation: https://docs.altv.mp/articles/configs/resource.html
-   */
-  export interface IResourceConfig {
-    readonly type?: string;
-    readonly deps?: ReadonlyArray<string>;
-    readonly main?: string;
-    readonly "client-main"?: string;
-    readonly "client-type"?: string;
-    readonly "client-files"?: ReadonlyArray<string>;
-    readonly "required-permissions"?: ReadonlyArray<shared.Permission>;
-    readonly "optional-permissions"?: ReadonlyArray<shared.Permission>;
-
-    readonly [key: string]: unknown;
-  }
-
-  /**
    * The root directory of the server.
    */
   export const rootDir: string;
@@ -628,7 +612,7 @@ declare module "alt-server" {
      */
     public setSyncedMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomBaseObjectSyncedMeta, K>): void;
     public setSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomBaseObjectSyncedMeta>>(key: K, value: shared.ICustomBaseObjectSyncedMeta[K]): void;
-    /** @deprecated See {@link "alt-shared".ICustomEntitySyncedMeta} */
+    /** @deprecated See {@link "alt-shared".ICustomBaseObjectSyncedMeta} */
     public setSyncedMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomBaseObjectSyncedMeta, K, V>): void;
   }
 
@@ -802,6 +786,49 @@ declare module "alt-server" {
 
     public hasMeta(key: string): boolean;
     public hasMeta<K extends shared.ExtractStringKeys<ICustomEntityMeta>>(key: K): boolean;
+
+    /**
+     * Removes the specified key and the data connected to that specific key.
+     *
+     * @param key The key of the value to remove.
+     */
+    public deleteSyncedMeta(key: string): void;
+    public deleteSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntitySyncedMeta>>(key: K): void;
+
+    /**
+     * Gets a value using the specified key.
+     *
+     * @param key The key of the value to get.
+     * @returns Dynamic value associated with the specified key or undefined if no data is present.
+     */
+    public getSyncedMeta<K extends string>(key: Exclude<K, keyof shared.ICustomEntitySyncedMeta>): unknown;
+    public getSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntitySyncedMeta>>(key: K): shared.ICustomEntitySyncedMeta[K] | undefined;
+    /** @deprecated See {@link "alt-shared".ICustomEntitySyncedMeta} */
+    public getSyncedMeta<V extends any>(key: string): V | undefined;
+
+    /**
+     * Determines whether contains the specified key.
+     *
+     * @param key The key of the value to locate.
+     * @returns True if the meta table contains any data at the specified key or False if not
+     */
+    public hasSyncedMeta(key: string): boolean;
+    public hasSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntitySyncedMeta>>(key: K): boolean;
+
+    public getSyncedMetaKeys(): ReadonlyArray<string>;
+
+    /**
+     * Stores the given value with the specified key.
+     *
+     * @remarks The given value will be shared with all clients.
+     *
+     * @param key The key of the value to store.
+     * @param value The value to store.
+     */
+    public setSyncedMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomEntitySyncedMeta, K>): void;
+    public setSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntitySyncedMeta>>(key: K, value: shared.ICustomEntitySyncedMeta[K]): void;
+    /** @deprecated See {@link "alt-shared".ICustomEntitySyncedMeta} */
+    public setSyncedMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomEntitySyncedMeta, K, V>): void;
 
     /**
      * Removes the specified key and the data connected to that specific key.
@@ -1161,7 +1188,7 @@ declare module "alt-server" {
      * @param texture Texture id of the clothing.
      * @param palette Palette of the clothing.
      */
-    public setClothes(component: number, drawable: number, texture: number, palette?: number): void;
+    public setClothes(component: number, drawable: number, texture: number, palette?: number): boolean;
 
     /**
      * Sets the specified dlc clothing component.
@@ -1178,7 +1205,7 @@ declare module "alt-server" {
      * @param texture Texture id of the clothing.
      * @param palette Palette of the clothing.
      */
-    public setDlcClothes(dlc: number, component: number, drawable: number, texture: number, palette?: number): void;
+    public setDlcClothes(dlc: number, component: number, drawable: number, texture: number, palette?: number): boolean;
 
     /**
      * Gets the specified prop component.
@@ -1218,7 +1245,7 @@ declare module "alt-server" {
      * @param drawable Drawable id of the prop.
      * @param texture Texture id of the prop.
      */
-    public setProp(component: number, drawable: number, texture: number): void;
+    public setProp(component: number, drawable: number, texture: number): boolean;
 
     /**
      * Sets the specified dlc prop component.
@@ -1233,7 +1260,7 @@ declare module "alt-server" {
      * @param drawable Drawable id of the prop.
      * @param texture Texture id of the prop.
      */
-    public setDlcProp(dlc: number, component: number, drawable: number, texture: number): void;
+    public setDlcProp(dlc: number, component: number, drawable: number, texture: number): boolean;
 
     /**
      * Removes a specified prop component.
@@ -1366,6 +1393,24 @@ declare module "alt-server" {
 
     public hasMeta(key: string): boolean;
     public hasMeta<K extends shared.ExtractStringKeys<ICustomPlayerMeta>>(key: K): boolean;
+
+    // synced meta
+
+    public setSyncedMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomPlayerSyncedMeta, K>): void;
+    public setSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerSyncedMeta>>(key: K, value: shared.ICustomPlayerSyncedMeta[K]): void;
+    /** @deprecated See {@link "alt-shared".ICustomPlayerSyncedMeta} */
+    public setSyncedMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomPlayerSyncedMeta, K, V>): void;
+
+    public deleteSyncedMeta(key: string): void;
+    public deleteSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerSyncedMeta>>(key: K): void;
+
+    public getSyncedMeta<K extends string>(key: Exclude<K, keyof shared.ICustomPlayerSyncedMeta>): unknown;
+    public getSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerSyncedMeta>>(key: K): shared.ICustomPlayerSyncedMeta[K] | undefined;
+    /** @deprecated See {@link "alt-shared".ICustomPlayerSyncedMeta} */
+    public getSyncedMeta<V extends any>(key: string): V | undefined;
+
+    public hasSyncedMeta(key: string): boolean;
+    public hasSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerSyncedMeta>>(key: K): boolean;
 
     // stream synced meta
 
@@ -2307,6 +2352,24 @@ declare module "alt-server" {
     public hasMeta(key: string): boolean;
     public hasMeta<K extends shared.ExtractStringKeys<ICustomVehicleMeta>>(key: K): boolean;
 
+    // synced meta
+
+    public setSyncedMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomVehicleSyncedMeta, K>): void;
+    public setSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomVehicleSyncedMeta>>(key: K, value: shared.ICustomVehicleSyncedMeta[K]): void;
+    /** @deprecated See {@link "alt-shared".ICustomVehicleSyncedMeta} */
+    public setSyncedMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomVehicleSyncedMeta, K, V>): void;
+
+    public deleteSyncedMeta(key: string): void;
+    public deleteSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomVehicleSyncedMeta>>(key: K): void;
+
+    public getSyncedMeta<K extends string>(key: Exclude<K, keyof shared.ICustomVehicleSyncedMeta>): unknown;
+    public getSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomVehicleSyncedMeta>>(key: K): shared.ICustomVehicleSyncedMeta[K] | undefined;
+    /** @deprecated See {@link "alt-shared".ICustomVehicleSyncedMeta} */
+    public getSyncedMeta<V extends any>(key: string): V | undefined;
+
+    public hasSyncedMeta(key: string): boolean;
+    public hasSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomVehicleSyncedMeta>>(key: K): boolean;
+
     // stream synced meta
 
     public setStreamSyncedMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomVehicleStreamSyncedMeta, K>): void;
@@ -2655,7 +2718,6 @@ declare module "alt-server" {
 
   export class Resource extends shared.Resource {
     public readonly path: string;
-    public readonly config: IResourceConfig;
 
     public static getByName(name: string): Resource | null;
     public static readonly all: ReadonlyArray<Resource>;

@@ -78,6 +78,8 @@ declare module "alt-client" {
     DisablePedPropKnockOff = "DISABLE_PED_PROP_KNOCK_OFF",
     DisableIdleCamera = "DISABLE_IDLE_CAMERA",
     DisableVehicleEngineShutdownOnLeave = "DISABLE_VEHICLE_ENGINE_SHUTDOWN_ON_LEAVE",
+    /** @alpha */
+    DisableSPEnterVehicleClipset = "DISABLE_SP_ENTER_VEHICLE_CLIPSET" 
   }
 
   export const enum WatermarkPosition {
@@ -479,6 +481,8 @@ declare module "alt-client" {
 
     public readonly isStreamedIn: boolean;
 
+    public visible: boolean;
+
     /**
      * Gets a value using the specified key.
      * Only available for server-side created Virtual Entities.
@@ -612,13 +616,26 @@ declare module "alt-client" {
     public height: number;
     public color: shared.RGBA;
 
-    constructor(type: shared.CheckpointType, pos: shared.IVector3, nextPos: shared.IVector3, radius: number, height: number, rgbcolor: shared.RGBA);
+    constructor(type: shared.CheckpointType, pos: shared.IVector3, nextPos: shared.IVector3, radius: number, height: number, rgbcolor: shared.RGBA, streamingDistance: number);
+
+    /**
+     * Streaming range for the checkpoint
+     *
+     * @alpha
+     */
+    public readonly streamingDistance: number;
 
     /** @alpha */
     public static readonly all: ReadonlyArray<Checkpoint>;
 
     /** @alpha */
     public readonly count: number;
+
+    /** @alpha */
+    public readonly isStreamedIn: boolean;
+
+    /** @alpha */
+    public visible: boolean;
 
     /**
      * Retrieves the checkpoint from the pool.
@@ -1054,6 +1071,9 @@ declare module "alt-client" {
      */
     public readonly dimension: number;
 
+    /** @alpha */
+    public pos: shared.Vector3;
+
     /**
      * Ammo of the currently held weapon.
      *
@@ -1150,7 +1170,7 @@ declare module "alt-client" {
      *
      * @returns Normalised value on a scale of [0, 1].
      */
-    public readonly rpm: number;
+    public rpm: number;
 
     /**
      * Vehicle wheels speed.
@@ -3604,6 +3624,9 @@ declare module "alt-client" {
 
     /** @alpha */
     public readonly streamingDistance: number;
+
+    /** @alpha */
+    public visible: boolean;
 
     /**
      * Attaches the object to another entity.

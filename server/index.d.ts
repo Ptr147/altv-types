@@ -664,6 +664,8 @@ declare module "alt-server" {
     /** Streaming range for the virtual entity */
     public readonly streamingDistance: number;
 
+    public visible: boolean;
+
     /**
      * Gets a value using the specified key.
      *
@@ -2598,11 +2600,11 @@ declare module "alt-server" {
   }
 
   export class Checkpoint extends Colshape {
-    constructor(type: shared.CheckpointType, x: number, y: number, z: number, radius: number, height: number, r: number, g: number, b: number, a: number);
-    constructor(type: shared.CheckpointType, pos: shared.IVector3, radius: number, height: number, color: shared.RGBA);
+    constructor(type: shared.CheckpointType, x: number, y: number, z: number, radius: number, height: number, r: number, g: number, b: number, a: number, streamingDistance: number);
+    constructor(type: shared.CheckpointType, pos: shared.IVector3, radius: number, height: number, color: shared.RGBA, streamingDistance: number);
 
     /**
-     * Streaming range for the virtual entity
+     * Streaming range for the checkpoint
      *
      * @alpha
      */
@@ -2613,6 +2615,9 @@ declare module "alt-server" {
 
     /** @alpha */
     public readonly count: number;
+
+    /** @alpha */
+    public visible: boolean;
 
     /**
      * Retrieves the checkpoint from the pool.

@@ -1074,6 +1074,9 @@ declare module "alt-client" {
     /** @alpha */
     public pos: shared.Vector3;
 
+    /** @alpha */
+    public rot: shared.Vector3;
+
     /**
      * Ammo of the currently held weapon.
      *
@@ -3740,7 +3743,7 @@ declare module "alt-client" {
 
   /** @alpha */
   export class Marker extends WorldObject {
-    public constructor(type: shared.MarkerType, position: shared.Vector3, color: shared.RGBA);
+    public constructor(type: shared.MarkerType, position: shared.Vector3, color: shared.RGBA, useStreaming?: boolean, streamingDistance?: number);
 
     /**
      * Retrieves the marker from the pool.
@@ -3774,6 +3777,12 @@ declare module "alt-client" {
     public readonly isRemote: boolean;
 
     public readonly remoteId: number;
+
+    public readonly streamingDistance: number;
+
+    public readonly isStreamedIn: boolean;
+
+    public faceCamera: boolean;
   }
 
   /** @alpha */

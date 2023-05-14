@@ -413,6 +413,11 @@ declare module "alt-client" {
     drawOnEnts?: boolean;
   }
 
+  export interface IInputDevice {
+    readonly name: string;
+    readonly uuid: string | null;
+  }
+
   export class BaseObject extends shared.BaseObject {
     /**
      * Gets the base object with the given type and local id
@@ -2372,7 +2377,13 @@ declare module "alt-client" {
     public noiseSuppressionEnabled: boolean;
 
     /** @alpha */
+    public inputDevice: string | null;
+
+    /** @alpha */
     public toggleInput: boolean;
+
+    /** @alpha */
+    public getAvailableInputDevices: ReadonlyArray<IInputDevice>;
 
     /**
      * Determines if the voice activation is enabled.
@@ -2844,6 +2855,9 @@ declare module "alt-client" {
   export function toggleGameControls(state: boolean): void;
 
   export function toggleVoiceControls(state: boolean): void;
+
+  /* @alpha */
+  export function isFullScreen(): boolean;
 
   export class WebSocketClient extends BaseObject {
     /**
@@ -3880,7 +3894,7 @@ declare module "alt-client" {
 
   /** @alpha */
   export class TextLabel extends WorldObject {
-    public constructor(text: string, fontName: string, fontSize: number, scale: number, pos: shared.IVector3, rot: shared.IVector3, color: shared.RGBA, outlineWidth: number, outlineColor: shared.RGBA);
+    public constructor(text: string, fontName: string, fontSize: number, scale: number, pos: shared.IVector3, rot: shared.IVector3, color: shared.RGBA, outlineWidth: number, outlineColor: shared.RGBA, useStreaming?: boolean, streamingDistance?: number);
 
     /**
      * Retrieves the marker from the pool.
@@ -3910,11 +3924,17 @@ declare module "alt-client" {
     public readonly isRemote: boolean;
 
     public readonly remoteId: number;
+
+    public readonly isStreamedIn: boolean;
+
+    public readonly streamingDistance: number;
+
+    public faceCamera: boolean;
   }
 
   /** @alpha */
   export class LocalVehicle extends WorldObject {
-    public constructor(model: string | number, dimension: number, pos: shared.IVector3, rot: shared.IVector3, useStreaming: boolean, streamingDistance: number);
+    public constructor(model: string | number, dimension: number, pos: shared.IVector3, rot: shared.IVector3, useStreaming?: boolean, streamingDistance?: number);
 
     /**
      * Retrieves the localvehicle from the pool.
@@ -4121,7 +4141,7 @@ declare module "alt-client" {
 
   /** @alpha */
   export class LocalPed extends WorldObject {
-    public constructor(model: string | number, dimension: number, pos: shared.IVector3, rot: shared.IVector3, useStreaming: boolean, streamingDistance: number);
+    public constructor(model: string | number, dimension: number, pos: shared.IVector3, rot: shared.IVector3, useStreaming?: boolean, streamingDistance?: number);
 
     /**
      * Retrieves the localPed from the pool.

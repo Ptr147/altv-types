@@ -90,20 +90,18 @@ declare module "alt-client" {
     BottomCenter = 4,
   }
 
-  export const enum ProfileSourceType {
-    Script = "script",
-    Builtin = "builtins",
-    Native = "native-callback",
-    Internal = "internal",
-    Unknown = "unknown",
-  }
-
   export const enum GameFont {
     ChaletLondon,
     HouseScript,
     Monospace,
     CharletComprimeColonge = 4,
     Pricedown = 7,
+  }
+
+  export const enum TextAlign {
+    Center,
+    Left,
+    Rigth,
   }
 
   export interface IClientEvent {
@@ -301,31 +299,124 @@ declare module "alt-client" {
     readonly peakMallocedMemory: number;
   }
 
+  /**
+   * Follows Chrome DevTools cpuprofile format.
+   * See [Chrome DevTools protocol docs](https://chromedevtools.github.io/devtools-protocol/tot/Profiler/#type-Profile) for more details.
+   *
+   * In order to analyze resulting Profile - serialize this class as JSON and put to a .cpuprofile file.
+   * It will be available to use in DevTools on "Performance" tab, or in Visual Studio Code.
+   *
+   * @example
+   * ```js
+   * // server
+   * alt.onClient("saveProfile", (player, name, content) => {
+   *     fs.writeFileSync("./" + name + ".cpuprofile", content);
+   * });
+   *
+   * // client
+   * alt.Profile.startProfiling("test");
+   * // do some stuff
+   * const profile = alt.Profile.stopProfiling("test");
+   * const content = JSON.stringify(profile);
+   * alt.emitServer("saveProfile", "test", content);
+   * ```
+   */
   export interface IProfile {
-    readonly id: number;
-    readonly type: string;
-    readonly start: number;
-    readonly end: number;
-    readonly samples: number;
-    readonly root: IProfileNode;
+    /**
+     * The list of profile nodes. First item is the root node.
+     */
+    readonly nodes: IProfileNode[];
+
+    /**
+     * Profiling start timestamp in microseconds.
+     */
+    readonly startTime: number;
+
+    /**
+     * Profiling end timestamp in microseconds.
+     */
+    readonly endTime: number;
+
+    /**
+     * Ids of samples top nodes.
+     */
+    readonly samples: number[];
+
+    /**
+     * Time intervals between adjacent samples in microseconds. The first delta is relative to the profile startTime.
+     */
+    readonly timeDeltas: number[];
+  }
+
+  export interface IProfileCallFrame {
+    /**
+     * JavaScript function name.
+     */
+    readonly functionName: string;
+
+    /**
+     * Unique id of the script.
+     */
+    readonly scriptId: number;
+
+    /**
+     * File path.
+     */
+    readonly url: string;
+
+    /**
+     * JavaScript script line number (0-based).
+     */
+    readonly lineNumber: number;
+
+    /**
+     * JavaScript script column number (0-based).
+     */
+    readonly columnNumber: number;
   }
 
   export interface IProfileNode {
+    /**
+     * Unique id of the node.
+     */
     readonly id: number;
-    readonly function: string;
-    readonly source: string;
-    readonly sourceType: ProfileSourceType | `${ProfileSourceType}`;
-    readonly line: number;
-    readonly bailoutReason: string | null;
+
+    /**
+     * Function location.
+     */
+    readonly callFrame: IProfileCallFrame;
+
+    /**
+     * Number of samples where this node was on top of the call stack.
+     */
     readonly hitCount: number;
-    readonly timestamp: number;
-    readonly children: ReadonlyArray<IProfileNode> | null;
-    readonly lineTicks: ReadonlyArray<ILineTick> | null;
+
+    /**
+     * Child node ids.
+     */
+    readonly children?: ReadonlyArray<number>;
+
+    /**
+     * The reason of being not optimized. The function may be deoptimized or marked as don't optimize.
+     */
+    readonly deoptReason?: string;
+
+    /**
+     * An array of source position ticks.
+     */
+    readonly positionTicks: ReadonlyArray<IProfileTickInfo>;
   }
 
-  export interface ILineTick {
+  export interface IProfileTickInfo {
+    /**
+     * Source line number (1-based).
+     */
     readonly line: number;
-    readonly hitCount: number;
+
+    /**
+     * Number of samples attributed to the source line.
+     */
+    readonly ticks: number;
   }
 
   /**
@@ -420,16 +511,22 @@ declare module "alt-client" {
 
   export class BaseObject extends shared.BaseObject {
     /**
+     * Whether this entity was created clientside or serverside. (Clientside = false, Serverside = true).
+     *
+     * @alpha
+     */
+    public readonly isRemote: boolean;
+    /**
+     * The serverside id of this entity.
+     * @alpha
+     * */
+    public readonly remoteId: number;
+
+    /**
      * Gets the base object with the given type and local id
      * @alpha
      */
     public getByID(type: shared.BaseObjectType, id: number): BaseObject;
-
-    /**
-     * Gets the base object with the given type and remote id
-     * @alpha
-     */
-    public getByRemoteID(type: shared.BaseObjectType, id: number): BaseObject;
 
     public deleteMeta(key: string): void;
     public deleteMeta<K extends shared.ExtractStringKeys<ICustomBaseObjectMeta>>(key: K): void;
@@ -451,16 +548,13 @@ declare module "alt-client" {
   /** @alpha */
   export class VirtualEntityGroup extends BaseObject {
     /** Creates a new Virtual Entity Group */
-    public constructor(maxStreamedEntityCount: number);
+    public constructor(maxEntitiesInStream: number);
 
     /** Returns all Virtual Entity Group instances */
     public static readonly all: ReadonlyArray<VirtualEntityGroup>;
 
-    /** Unique id */
-    public readonly id: number;
-
     /** Maximum streaming range of the Virtual Entity Group */
-    public readonly streamingRangeLimit: number;
+    public readonly maxEntitiesInStream: number;
   }
 
   /** @alpha */
@@ -473,16 +567,8 @@ declare module "alt-client" {
 
     public static readonly streamedIn: ReadonlyArray<VirtualEntity>;
 
-    /** Unique clientside id */
-    public readonly id: number;
-
     /** Virtual Entity Group this entity belongs to */
     public readonly group: VirtualEntityGroup;
-
-    /** Unique serverside id */
-    public readonly remoteId: number;
-
-    public readonly isRemote: boolean;
 
     public readonly isStreamedIn: boolean;
 
@@ -534,12 +620,6 @@ declare module "alt-client" {
 
     /** @alpha */
     public readonly count: number;
-
-    /** @alpha */
-    public readonly id: number;
-
-    /** @alpha */
-    public readonly remoteId: number;
 
     public source: string;
 
@@ -652,6 +732,14 @@ declare module "alt-client" {
      */
     public static getByID(id: number): Checkpoint | null;
 
+    /**
+     * @alpha
+     */
+    public static getByScriptID(scriptID: number): Checkpoint | null;
+
+    /** @alpha */
+    public readonly scriptID: number;
+
     public isEntityIn(entity: Entity): boolean;
     public isPointIn(pos: shared.IVector3): boolean;
 
@@ -689,9 +777,6 @@ declare module "alt-client" {
      */
     public static readonly all: ReadonlyArray<Entity>;
 
-    /** Entity unique id */
-    public readonly id: number;
-
     /** Internal game id that can be used in native calls */
     public readonly scriptID: number;
 
@@ -714,15 +799,19 @@ declare module "alt-client" {
     public readonly isSpawned: boolean;
 
     /** Hash of entity model */
-    public readonly model: number;
+    public get model(): number;
 
     /**
-     * Object position
+     * Object position.
+     * @remarks Setting this throws an error if the client is not the network owner of an entity
      */
-    public readonly pos: shared.Vector3;
+    public pos: shared.Vector3;
 
-    /** Entity rotation in radians */
-    public readonly rot: shared.Vector3;
+    /**
+     * Entity rotation in radians
+     * @remarks Setting this throws an error if the client is not the network owner of an entity
+     */
+    public rot: shared.Vector3;
 
     public readonly visible: boolean;
 
@@ -985,6 +1074,12 @@ declare module "alt-client" {
      * @returns Entity if it was found, otherwise null.
      */
     public static getByScriptID(scriptID: number): Player | null;
+
+    /**
+     * Gets the player with the given remote id
+     * @alpha
+     */
+    public static getByRemoteID(id: number): Player | null;
 
     /**
      * Set & get the volume for 3D Voice.
@@ -1694,6 +1789,12 @@ declare module "alt-client" {
      * @returns Entity if it was found, otherwise null.
      */
     public static getByScriptID(scriptID: number): Vehicle | null;
+
+    /**
+     * Gets the vehicle with the given remote id
+     * @alpha
+     */
+    public static getByRemoteID(id: number): Vehicle | null;
   }
 
   export class WebView extends BaseObject {
@@ -1717,9 +1818,6 @@ declare module "alt-client" {
 
     /** @alpha */
     public readonly count: number;
-
-    /** @alpha */
-    public readonly id: number;
 
     /**
      * Is the webview a overlay.
@@ -2062,8 +2160,11 @@ declare module "alt-client" {
      */
     public static getByScriptID(scriptID: number): Blip | null;
 
-    /** @alpha */
-    public readonly remoteId: number;
+    /**
+     * Gets the blip with the given remote id
+     * @alpha
+     */
+    public static getByRemoteID(id: number): Blip | null;
 
     public readonly scriptID: number;
 
@@ -2129,10 +2230,8 @@ declare module "alt-client" {
 
     public tickVisible: boolean;
 
-    /**
-     * Returns whether the blip was created on serverside (false for clientside blips)
-     */
-    public readonly isRemote: boolean;
+    /** @alpha */
+    public visible: boolean;
 
     public fade(opacity: number, duration: number): void;
 
@@ -2870,9 +2969,6 @@ declare module "alt-client" {
      */
     public static getByID(id: number): WebSocketClient | null;
 
-    /** @alpha */
-    public readonly id: number;
-
     public autoReconnect: boolean;
 
     public perMessageDeflate: boolean;
@@ -3001,9 +3097,6 @@ declare module "alt-client" {
      * @alpha
      */
     public static getByID(id: number): HttpClient | null;
-
-    /** @alpha */
-    public readonly id: number;
 
     public setExtraHeader(header: string, value: string): void;
 
@@ -3185,8 +3278,6 @@ declare module "alt-client" {
      * @alpha
      */
     public static getByID(id: number): RmlDocument | null;
-
-    public readonly id: number;
 
     public readonly sourceUrl: string;
 
@@ -3379,13 +3470,13 @@ declare module "alt-client" {
 
     export function requestCutscene(cutsceneName: string, flags: string | number, timeout?: number): Promise<void>;
 
-    export function drawText2dThisFrame(text: string, pos2d?: shared.IVector2, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean): void;
+    export function drawText2dThisFrame(text: string, pos2d?: shared.IVector2, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean, textAlign?: TextAlign): void;
 
-    export function drawText2d(text: string, pos2d?: shared.IVector2, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean): shared.Utils.EveryTick;
+    export function drawText2d(text: string, pos2d?: shared.IVector2, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean, textAlign?: TextAlign): shared.Utils.EveryTick;
 
-    export function drawText3dThisFrame(text: string, pos3d: shared.IVector3, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean): void;
+    export function drawText3dThisFrame(text: string, pos3d: shared.IVector3, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean, textAlign?: TextAlign): void;
 
-    export function drawText3d(text: string, pos3d: shared.IVector3, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean): shared.Utils.EveryTick;
+    export function drawText3d(text: string, pos3d: shared.IVector3, font?: GameFont, scale?: number, color?: shared.RGBA, outline?: boolean, dropShadow?: boolean, textAlign?: TextAlign): shared.Utils.EveryTick;
 
     /**
      * Loads the map area at a certain position
@@ -3633,6 +3724,9 @@ declare module "alt-client" {
 
     public rot: shared.Vector3;
 
+    public get model(): number;
+    public set model(model: number | string);
+
     /** Object transparency, values are between 0 and 255. (0 being fully transparent) */
     public alpha: number;
     public resetAlpha(): void;
@@ -3644,9 +3738,6 @@ declare module "alt-client" {
 
     /** Whether the object is affected by gravity. */
     public hasGravity: boolean;
-
-    /** Whether this object was created clientside or serverside. (Clientside = false, Serverside = true) */
-    public readonly isRemote: boolean;
 
     /** @alpha */
     public readonly isStreamedIn: boolean;
@@ -3784,9 +3875,6 @@ declare module "alt-client" {
 
     public static readonly all: ReadonlyArray<Marker>;
 
-    /** Unique id */
-    public readonly id: number;
-
     public visible: boolean;
 
     public markerType: shared.MarkerType;
@@ -3803,15 +3891,15 @@ declare module "alt-client" {
 
     public readonly target: Player;
 
-    public readonly isRemote: boolean;
-
-    public readonly remoteId: number;
-
     public readonly streamingDistance: number;
 
     public readonly isStreamedIn: boolean;
 
     public faceCamera: boolean;
+
+    public rotate: boolean;
+
+    public bobUpAndDown: boolean;
   }
 
   /** @alpha */
@@ -3825,12 +3913,6 @@ declare module "alt-client" {
      * Whether this colshape should only trigger its enter/leave events for players or all entities.
      */
     public playersOnly: boolean;
-
-    public readonly id: number;
-
-    public readonly remoteId: number;
-
-    public readonly isRemote: boolean;
 
     /**
      * Retrieves the colshape from the pool.
@@ -3906,9 +3988,6 @@ declare module "alt-client" {
 
     //public static readonly all: ReadonlyArray<TextLabel>;
 
-    /** Unique id */
-    public readonly id: number;
-
     public visible: boolean;
 
     public color: shared.RGBA;
@@ -3920,10 +3999,6 @@ declare module "alt-client" {
     public readonly isGlobal: boolean;
 
     public readonly target: Player;
-
-    public readonly isRemote: boolean;
-
-    public readonly remoteId: number;
 
     public readonly isStreamedIn: boolean;
 
@@ -3952,9 +4027,8 @@ declare module "alt-client" {
      */
     public static getByScriptID(scriptID: number): LocalVehicle | null;
 
-    public readonly id: number;
-
-    public readonly model: number;
+    public get model(): number;
+    public set model(model: number | string);
 
     public rot: shared.Vector3;
 
@@ -3963,10 +4037,6 @@ declare module "alt-client" {
     public visible: boolean;
 
     public readonly scriptID: number;
-
-    public readonly remoteId: number;
-
-    public readonly isRemote: boolean;
 
     public readonly isStreamedIn: boolean;
 
@@ -4159,9 +4229,8 @@ declare module "alt-client" {
      */
     public static getByScriptID(scriptID: number): LocalPed | null;
 
-    public readonly id: number;
-
-    public readonly model: number;
+    public get model(): number;
+    public set model(model: number | string);
 
     public rot: shared.Vector3;
 
@@ -4171,11 +4240,14 @@ declare module "alt-client" {
 
     public readonly scriptID: number;
 
-    public readonly remoteId: number;
-
-    public readonly isRemote: boolean;
-
     public readonly isStreamedIn: boolean;
+  }
+
+  /** @alpha */
+  export class Font extends BaseObject {
+    protected constructor();
+
+    public static register(path: string): Font;
   }
 
   export * from "alt-shared";

@@ -26,6 +26,9 @@ declare module "alt-shared" {
     LocalPed,
     LocalVehicle,
     AudioFilter,
+    ConnectionInfo,
+    CustomTexture,
+    Font,
     Size,
   }
 
@@ -2264,6 +2267,8 @@ declare module "alt-shared" {
      * @returns False if object is no longer usable.
      */
     public readonly valid: boolean;
+
+    public readonly id: number;
 
     /**
      * Removes the object from the world.

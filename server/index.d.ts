@@ -254,9 +254,8 @@ declare module "alt-server" {
     readonly id: number;
     /** @alpha */
     readonly cloudAuthHash: string;
-  }
+    readonly isAccepted: boolean;
 
-  export interface IConnectionQueueInfo extends IConnectionInfo {
     /**
      * Accepts client connection.
      *
@@ -264,7 +263,13 @@ declare module "alt-server" {
      */
     accept: (sendNames?: boolean) => void;
     decline: (reason: string) => void;
-    readonly isAccepted: boolean;
+  }
+
+  export class ConnectionInfo {
+    /** @alpha */
+    static readonly all: ReadonlyArray<IConnectionInfo>;
+    /** @alpha */
+    static getByID(id: number): IConnectionInfo | null;
   }
 
   export const enum ConnectDeniedReason {
@@ -322,8 +327,8 @@ declare module "alt-server" {
     playerWeaponChange: (player: Player, oldWeapon: number, weapon: number) => boolean | void;
     vehicleDamage: (vehicle: Vehicle, attacker: Entity | null, bodyHealthDamage: number, additionalBodyHealthDamage: number, engineHealthDamage: number, petrolTankDamage: number, weapon: number) => void;
     localMetaChange: (player: Player, key: string, newValue: any, oldValue: any) => void;
-    connectionQueueAdd: (connectionInfo: IConnectionQueueInfo) => void;
-    connectionQueueRemove: (connectionInfo: IConnectionQueueInfo) => void;
+    connectionQueueAdd: (connectionInfo: IConnectionInfo) => void;
+    connectionQueueRemove: (connectionInfo: IConnectionInfo) => void;
     serverStarted: () => void;
     playerRequestControl: (player: Player, target: Entity) => boolean | void;
     playerAnimationChange: (target: Player, oldAnimDict: number, newAnimDict: number, oldAnimName: number, newAnimName: number) => void;
@@ -635,16 +640,13 @@ declare module "alt-server" {
   /** @alpha */
   export class VirtualEntityGroup extends BaseObject {
     /** Creates a new Virtual Entity Group */
-    public constructor(maxStreamedEntityCount: number);
+    public constructor(maxEntitiesInStream: number);
 
     /** Returns all Virtual Entity Group instances */
     public static readonly all: ReadonlyArray<VirtualEntityGroup>;
 
-    /** Unique id */
-    public readonly id: number;
-
     /** Maximum streaming range inside the Virtual Entity Group */
-    public readonly streamingRangeLimit: number;
+    public readonly maxEntitiesInStream: number;
   }
 
   /** @alpha */
@@ -654,9 +656,6 @@ declare module "alt-server" {
 
     /** Returns all Virtual Entity instances */
     public static readonly all: ReadonlyArray<VirtualEntity>;
-
-    /** Unique id */
-    public readonly id: number;
 
     /** Virtual Entity Group this entity belongs to */
     public readonly group: VirtualEntityGroup;
@@ -728,11 +727,6 @@ declare module "alt-server" {
     public static readonly all: ReadonlyArray<Entity>;
 
     /**
-     * Internal identificator of the entity which is identical on both sides.
-     */
-    public readonly id: number;
-
-    /**
      * Network owner of the entity.
      *
      * @remarks Network owner is responsible for syncing entity with the server.
@@ -765,14 +759,6 @@ declare module "alt-server" {
      * Whether the entity should be streamed for other entities.
      */
     public streamed: boolean;
-
-    /**
-     * Retrieves the entity from the pool.
-     *
-     * @param id The id of the entity.
-     * @returns Entity if it was found, otherwise null.
-     */
-    public static getByID(id: number): Entity | null;
 
     public setMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<ICustomEntityMeta, K>): void;
     public setMeta<K extends shared.ExtractStringKeys<ICustomEntityMeta>>(key: K, value: ICustomEntityMeta[K]): void;
@@ -942,6 +928,8 @@ declare module "alt-server" {
      * ```
      */
     public static readonly all: ReadonlyArray<Player>;
+    /** @alpha */
+    public readonly streamedEntities: ReadonlyArray<{ entity: Entity; distance: number }>;
     /** @alpha */
     public readonly count: number;
     public armour: number;
@@ -1288,8 +1276,6 @@ declare module "alt-server" {
      * ```
      */
     public isEntityInStreamRange(entity: Entity): boolean;
-
-    public isEntityInStreamRange(entityID: number): boolean;
 
     /**
      * Set the player into a vehicle on specific seat.
@@ -2428,9 +2414,6 @@ declare module "alt-server" {
 
     public sprite: shared.BlipSprite;
 
-    /** @alpha */
-    public readonly id: number;
-
     /**
      * @remarks Does't properly work for areablips currently.
      */
@@ -2539,9 +2522,6 @@ declare module "alt-server" {
      * Whether this colshape should only trigger its enter/leave events for players or all entities.
      */
     public playersOnly: boolean;
-
-    /** @alpha */
-    public readonly id: number;
 
     /**
      * Retrieves the colshape from the pool.
@@ -2675,9 +2655,6 @@ declare module "alt-server" {
      * @param maxDistance The max distance at which you can hear each other.
      */
     constructor(isSpatial: boolean, maxDistance: number);
-
-    /** @alpha */
-    public readonly id: number;
 
     /** @alpha */
     public readonly maxDistance: number;
@@ -3126,9 +3103,6 @@ declare module "alt-server" {
     public static getByID(id: number): Marker | null;
 
     public static readonly all: ReadonlyArray<Marker>;
-
-    /** Unique id */
-    public readonly id: number;
 
     public visible: boolean;
 

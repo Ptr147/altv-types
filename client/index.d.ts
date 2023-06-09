@@ -80,6 +80,8 @@ declare module "alt-client" {
     DisableVehicleEngineShutdownOnLeave = "DISABLE_VEHICLE_ENGINE_SHUTDOWN_ON_LEAVE",
     /** @alpha */
     DisableSPEnterVehicleClipset = "DISABLE_SP_ENTER_VEHICLE_CLIPSET",
+    /** @alpha */
+    ForceRenderSnow = "FORCE_RENDER_SNOW"
   }
 
   export const enum WatermarkPosition {
@@ -127,6 +129,18 @@ declare module "alt-client" {
      * @remarks The seat indexes start with 1 (driver seat).
      */
     leftVehicle: (vehicle: Vehicle, seat: number) => void;
+    /**
+     * @alpha
+     *
+     * @remarks The seat indexes start with 1 (driver seat).
+     */
+    startEnteringVehicle: (vehicle: Vehicle, seat: number) => boolean | void;
+    /**
+     * @alpha
+     *
+     * @remarks The seat indexes start with 1 (driver seat).
+     */
+    startLeavingVehicle: (vehicle: Vehicle, seat: number) => boolean | void;
     removeEntity: (object: Entity) => void;
     resourceStart: (errored: boolean) => void;
     resourceStop: () => void;
@@ -138,7 +152,7 @@ declare module "alt-client" {
     /**
      * @remarks See https://alloc8or.re/gta5/doc/enums/eTaskTypeIndex.txt for task ids.
      */
-    taskChange: (oldTask: number, newTask: number) => void;
+    taskChange: (oldTask: number, newTask: number) => boolean | void;
     spawned: () => void;
     localMetaChange: (key: string, newValue: any, oldValue: any) => void;
 
@@ -163,7 +177,7 @@ declare module "alt-client" {
     /** @alpha */
     baseObjectRemove: (baseObject: BaseObject) => void;
 
-    weaponDamage: (target: Entity, weaponHash: number, damage: number, offset: shared.Vector3, bodyPart: shared.BodyPart) => boolean | void;
+    weaponDamage: (target: Entity, weaponHash: number, damage: number, offset: shared.Vector3, bodyPart: shared.BodyPart, sourceEntity: Entity) => number | boolean | void;
 
     /**
      * Triggers when an Virtual Entity position is changed
@@ -189,6 +203,9 @@ declare module "alt-client" {
 
     /** @alpha */
     entityLeaveColshape: (colshape: Colshape, entity: Entity) => void;
+
+    /** @alpha */
+    entityHitEntity: (damager: Entity, target: Entity, weaponHash: number) => void;
   }
 
   export interface IDiscordUser {
@@ -890,6 +907,8 @@ declare module "alt-client" {
     public hasStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntityStreamSyncedMeta>>(key: K): boolean;
 
     public getStreamSyncedMetaKeys(): ReadonlyArray<string>;
+
+    public frozen: boolean;
   }
 
   export class Player extends Entity {
@@ -1988,6 +2007,9 @@ declare module "alt-client" {
      * @param value Zoom level value.
      */
     public setZoomLevel(value: number): void;
+
+    /** @alpha */
+    public reload(ignoreCache?: boolean): void;
 
     public deleteMeta(key: string): void;
     public deleteMeta<K extends shared.ExtractStringKeys<ICustomWebViewMeta>>(key: K): void;
@@ -3793,6 +3815,27 @@ declare module "alt-client" {
   }
 
   /** @alpha */
+  export class WeaponObject extends Object {
+    constructor(weaponHash: string | number, pos: shared.Vector3, rot: shared.Vector3, modelHash?: string | number, numAmmo?: number, createDefaultComponents?: boolean, scale?: number, useStreaming?: boolean, streamingDistance?: number);
+
+    public static readonly all: ReadonlyArray<WeaponObject>;
+
+    public readonly count: number;
+
+    public readonly isWeaponObject: boolean;
+
+    public tintIndex: number;
+
+    public setComponentTintIndex(componentId: number, tintIndex: number): void;
+
+    public getComponentTintIndex(componentId: number): number;
+
+    public giveComponent(componentType: number): void;
+
+    public removeComponent(componentType: number): void;
+  }
+
+  /** @alpha */
   export class NetworkObject extends Entity {
     public static readonly all: ReadonlyArray<NetworkObject>;
 
@@ -3815,6 +3858,14 @@ declare module "alt-client" {
      * @returns Entity if it was found, otherwise null.
      */
     public static getByID(id: number): Ped | null;
+
+    /**
+     * Retrieves the ped from the pool.
+     *
+     * @param scriptID The script id of the entity.
+     * @returns Entity if it was found, otherwise null.
+     */
+    public static getByScriptID(scriptID: number): Ped | null;
 
     public static readonly all: ReadonlyArray<Ped>;
 
@@ -4210,7 +4261,7 @@ declare module "alt-client" {
   }
 
   /** @alpha */
-  export class LocalPed extends WorldObject {
+  export class LocalPed extends Ped {
     public constructor(model: string | number, dimension: number, pos: shared.IVector3, rot: shared.IVector3, useStreaming?: boolean, streamingDistance?: number);
 
     /**

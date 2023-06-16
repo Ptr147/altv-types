@@ -426,6 +426,8 @@ declare module "alt-server" {
     hasExtra(extraId: number): boolean;
     hasDefaultExtra(extraId: number): boolean;
     readonly bones: ReadonlyArray<IBoneInfo>;
+    /** @alpha */
+    readonly canAttachCars: boolean;
   }
 
   export interface IPedModel {
@@ -436,6 +438,22 @@ declare module "alt-server" {
     readonly defaultUnarmedWeapon: string;
     readonly movementClipSet: string;
     readonly bones: ReadonlyArray<IBoneInfo>;
+  }
+
+  /** @alpha */
+  export interface IWeaponModel {
+    readonly hash: number;
+    readonly name: string;
+    readonly modelName: string;
+    readonly modelHash: number;
+    readonly ammoTypeHash: number;
+    readonly ammoType: string;
+    readonly ammoModelName: string;
+    readonly ammoModelHash: number;
+    readonly defaultMaxAmmoMp: number;
+    readonly skillAbove50MaxAmmoMp: number;
+    readonly maxSkillMaxAmmoMp: number;
+    readonly bonusMaxAmmoMp: number;
   }
 
   /**
@@ -910,6 +928,9 @@ declare module "alt-server" {
     public frozen: boolean;
 
     public collision: boolean;
+
+    /** @alpha */
+    public readonly getTimestamp: number;
   }
 
   export class Player extends Entity {
@@ -1334,6 +1355,18 @@ declare module "alt-server" {
 
     /** @alpha */
     public clearTasks(): void;
+
+    /** @alpha */
+    public getAmmo(ammoHash: number | string): number;
+
+    /** @alpha */
+    public setAmmo(ammoHash: number | string, ammo: number): void;
+
+    /** @alpha */
+    public getWeaponAmmo(weaponHash: number | string): number;
+
+    /** @alpha */
+    public setWeaponAmmo(weaponHash: number | string, ammo: number): void;
 
     // local meta
 
@@ -3034,6 +3067,9 @@ declare module "alt-server" {
   export function getVehicleModelInfoByHash(vehicleHash: number): IVehicleModel;
 
   export function getPedModelInfoByHash(pedModelHash: number): IPedModel;
+
+  /** @alpha */
+  export function getWeaponModelInfoByHash(weaponModelHash: number): IWeaponModel;
 
   export function getServerConfig(): IServerConfig;
 

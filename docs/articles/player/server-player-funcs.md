@@ -1,12 +1,12 @@
-# Player Server Functions
+# 玩家服务器函数
 
-This page will act as a representation on using the various player functions.
+这个页面将作为使用各种玩家函数的一个表示。
 
-These are meant to be used on server side.
+这些应该在服务器端中使用。
 
 ## addWeaponComponent
 
-Used to add a weapon component to a weapon based on its hash.
+用于根据武器的哈希值为其添加武器组件。
 
 ```js
 // weaponHash, componentHash
@@ -15,127 +15,127 @@ player.addWeaponComponent(0xDFE37640, 0x5B3E7DB6)
 
 ## deleteMeta
 
-Used to delete **server-side** meta that is cross-resource available.
+用于删除跨资源可用的**服务器端**元数据。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setMeta('cash', 500); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasMeta('cash')) { // key
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getMeta('cash'); // key
 
-	// Delete the meta.
+	// 删除元数据
     player.deleteMeta('cash'); // <--- Usage
 }
 ```
 
 ## deleteStreamSyncedMeta
 
-Used to delete data stored on the player entity that is accessible on **server-side** and **client-side**.
+用于删除存储在**服务器端**和**客户端**可访问的玩家实体上的数据。
 
-This type of synced meta is only accessible by players in streaming range of this player.
+这种类型的同步元仅可由该玩家的流范围内的玩家访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setStreamSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasStreamSyncedMeta('ping')) { // key
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getStreamSyncedMeta('ping'); // key
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteStreamSyncedMeta('ping'); // <--- Usage
 }
 ```
 
 ## deleteSyncedMeta
 
-Used to delete data stored on the player entity that is accessible on **server-side** and **client-side**.
+用于删除存储在**服务器端**和**客户端**可访问的玩家实体上的数据。
 
-This type of synced meta is accessible inside and **outside** streaming range.
+这种类型的同步元数据在流范围内和**外部**都可以访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasSyncedMeta('ping')) { // key
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getSyncedMeta('ping'); // key
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteSyncedMeta('ping'); // <--- Usage
 }
 ```
 
-## destroy
+## destroy（销毁）
 
-You should never use this. It won't do anything and may just crash your server. 
+你永远不应该使用它。它不会做任何事情，可能会让你的服务器崩溃。
 
-## getMeta
+## getMeta（获取元数据）
 
-Used to get **server-side** meta that is cross-resource available.
+用于获取跨资源可用的**服务器端**元数据。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setMeta('cash', 500); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasMeta('cash')) { // key
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getMeta('cash'); // <--- Usage
 
-	// Delete the meta.
+	// 删除元数据
     player.deleteMeta('cash'); // key
 }
 ```
 
 ## getStreamSyncedMeta
 
-Used to get data stored on the player entity that is accessible on **server-side** and **client-side**.
+用于获取存储在玩家实体上的数据，可以在**服务器端**和**客户端**访问。
 
-This type of synced meta is only accessible by players **inside** streaming range of this player.
+这种类型的同步元仅可由该玩家**流范围内**的玩家访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setStreamSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasStreamSyncedMeta('ping')) { // key
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getStreamSyncedMeta('ping'); // <--- Usage
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteStreamSyncedMeta('ping'); // key
 }
 ```
 
 ## getSyncedMeta
 
-Used to delete data stored on the player entity that is accessible on **server-side** and **client-side**.
+用于删除存储在**服务器端**和**客户端**可访问的玩家实体上的数据。
 
-This type of synced meta is accessible **inside** and outside streaming range.
+这种类型的同步元数据在流范围**内部**和**外部**都可以访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasSyncedMeta('ping')) { // key
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getSyncedMeta('ping'); // <--- Usage
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteSyncedMeta('ping'); // key
 }
 ```
 
 ## giveWeapon
 
-Used to give the player a weapon based on hash or appropriate name.
+用于根据哈希或适当的名称给玩家一种武器。
 
 ```js
 // weaponHash, ammoCount, equipThisWeaponNow?
@@ -144,74 +144,74 @@ player.giveWeapon(1141786504, 1, true); // Get a golf club.
 
 ## hasMeta
 
-Used to check if **server-side** meta is available. This works cross-resource.
+用于检查**服务端** 元数据是否可用。这可以跨资源工作。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setMeta('cash', 500); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasMeta('cash')) { // <---- Usage
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getMeta('cash'); // key
 
-	// Delete the meta.
+	// 删除元数据
     player.deleteMeta('cash'); // key
 }
 ```
 
 ## hasStreamSyncedMeta
 
-Used to check if the data stored on the player entity is available. This is accessible on **server-side** and **client-side**.
+用于检查存储在玩家实体上的数据是否可用。这可以在**服务器端**和**客户端**访问。
 
-This type of synced meta is only accessible by players in streaming range of this player.
+这种类型的同步元仅可由该玩家的流范围内的玩家访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setStreamSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasStreamSyncedMeta('ping')) { // <--- Usage
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getStreamSyncedMeta('ping'); // key
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteStreamSyncedMeta('ping'); // key
 }
 ```
 
 ## hasSyncedMeta
 
-Used to check if the data stored on the player entity is available. This is accessible on **server-side** and **client-side**.
+用于检查存储在玩家实体上的数据是否可用。这可以在**服务器端**和**客户端**访问。
 
-This type of synced meta is accessible **inside** and outside streaming range.
+这种类型的同步元数据在流范围**内部**和外部都可以访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasSyncedMeta('ping')) {  // <--- Usage
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getSyncedMeta('ping'); // key
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteSyncedMeta('ping'); // key
 }
 ```
 
 ## kick
 
-Used to a kick a player from the server. The **reason** when supplied to a kick function does not currently show it to the player.
+用来从服务器踢出玩家。提供给kick函数的**reason**目前不会显示给玩家。
 
-You may want to create a work-around that eventually disconnects the user after 5 seconds.
+你可能想创建一个解决方案，在5秒后断开与用户的连接。
 
 ```js
 alt.on('playerConnect', handleConnect);
 
-// Listen for player connections.
+// 监听玩家连接。
 function handleConnect(player) {
-	player.kick('Bye'); // Kick them instantly.
+	player.kick('Bye'); // 立即踢出他们。
     
 	// Kick them eventually.
     alt.setTimeout(() => {
@@ -222,15 +222,15 @@ function handleConnect(player) {
 
 ## removeAllWeapons
 
-Used to remove all weapons from the player.
+用于移除玩家身上的所有武器。
 
 ```js
-player.removeAllWeapons(); // Not much else to this.
+player.removeAllWeapons(); // 除此之外就没什么了。
 ```
 
 ## removeWeapon
 
-Used to remove a weapon based on its weaponHash.
+用于根据武器哈希值移除武器。
 
 ```js
 player.removeWeapon(1141786504); // Remove a golf club.
@@ -238,7 +238,7 @@ player.removeWeapon(1141786504); // Remove a golf club.
 
 ## removeWeaponComponent
 
-Used to remove a weapon component from a player's weapon.
+用于从玩家的武器中移除武器组件。
 
 ```js
 // weaponHash, componentHash
@@ -247,15 +247,15 @@ player.removeWeaponComponent(0xDFE37640, 0x5B3E7DB6)
 
 ## resetNetOwner
 
-Restores default functionality of netOwner. Average developers will likely not be using this.
+恢复netOwner的默认功能。一般的开发人员可能不会使用它。
 
 ## setDateTime
 
-Used to set the player's current time of day in-game. It is important to understand that time will still continue at whatever the player's current timescale is. 
+用于设置玩家在游戏中的当前时间。重要的是要理解，无论玩家当前的时间尺度是什么，时间仍然会继续。
 
-It is recommended to freeze the time if you wish for it to stay a certain time.
+如果您希望它停留在某个时间，建议冻结时间。
 
-This can be done with the native `native.pauseClock(true);` on **client-side**.
+这可以在**客户端**使用原生的`native.pauseclock(true);`来实现。
 
 ```js
 const currentServerTime = new Date(Date.now());
@@ -268,66 +268,66 @@ player.setDateTime(date.getDay(), date.getMonth(), date.getFullYear(), date.getH
 Used to set **server-side** meta on the player. This works cross-resource.
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setMeta('cash', 500); // <--- Usage (key, value)
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasMeta('cash')) { // key
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getMeta('cash'); // key
 
-	// Delete the meta.
+	// 删除元数据
     player.deleteMeta('cash'); // key
 }
 ```
 
 ## setNetOwner
 
-Used to change this entities network owner. Average developers will likely not be using this.
+用于更改此实体的网络所有者。一般的开发人员可能不会使用它。
 
 ## setStreamSyncedMeta
 
-Used to set the data stored on the player entity. This is accessible on **server-side** and **client-side**.
+用于设置存储在玩家实体上的数据。这可以在**服务器端**和**客户端**访问。
 
-This type of synced meta is only accessible by players in streaming range of this player.
+这种类型的同步元仅可由该玩家的流范围内的玩家访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setStreamSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasStreamSyncedMeta('ping')) { // <--- Usage
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getStreamSyncedMeta('ping'); // key
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteStreamSyncedMeta('ping'); // key
 }
 ```
 
 ## setSyncedMeta
 
-Used to set data stored on the player entity that is accessible on **server-side** and **client-side**.
+用于设置存储在**服务器端**和**客户端**可访问的玩家实体上的数据。
 
-This type of synced meta is accessible **inside** and **outside** streaming range.
+这种类型的同步元数据在流范围**内部**和**外部**都可以访问。
 
 ```js
-// Set the player's meta.
+// 设置玩家的元数据。
 player.setSyncedMeta('ping', player.ip); // key, value
 
-// Check if the meta exists.
+// 检查元数据是否存在
 if (player.hasSyncedMeta('ping')) {  // <--- Usage
-    // Get the meta from the player.
+    // 获取玩家身上的元数据
 	const currentCash = player.getSyncedMeta('ping'); // key
     
-	// Delete the meta.
+	// 删除元数据
     player.deleteSyncedMeta('ping'); // key
 }
 ```
 
 ## setWeaponTintIndex
 
-Used to set the weapon tint index of a weapon based on its hash.
+用于根据武器的哈希值设置武器的着色索引。
 
 ```js
 // weaponHash, componentHash
@@ -336,11 +336,11 @@ player.setWeaponTintIndex(0xDFE37640, 1)
 
 ## spawn
 
-Used to respawn the player after they die based on a Vector3 position. The last parameter is used to delay the spawn.
+用于在玩家死后根据Vector3位置重生。最后一个参数用于延迟刷出。
 
 ```js
 // x, y, z, delay
-player.spawn(0, 0, 0, 0); // Spawn player under the map at 0,0,0
+player.spawn(0, 0, 0, 0); // 在地图下0,0,0处生成玩家
 ```
 
 

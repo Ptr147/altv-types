@@ -1,28 +1,28 @@
-# Introduction to the LocalStorage
+# 介绍本地存储
 
-## A General Overview
+## 概述
 
-- The LocalStorage is as the name says **local/client-side only**.
-- The LocalStorage is a persistent client cached storage.
-- If the player deletes his cache folder the LocalStorage data will get lost!
+- 本地存储顾名思义 **本地/仅限客户端**.
+- LocalStorage是一个持久的客户端缓存存储。
+- 如果玩家删除了他的缓存文件夹，LocalStorage数据将会丢失!
 
-**Never use the LocalStorage for sensitive data. The content is saved as plain text on the disk.**
+**永远不要对敏感数据使用LocalStorage。内容以纯文本形式保存在磁盘上。**
 
-| Function Name          | Description                                                         |
+| 函数名         | 描述                                                        |
 | ---------------------- | ------------------------------------------------------------------- |
-| alt.LocalStorage.get       | Gets the value from the specified key in the local storage..        |
-| alt.LocalStorage.set       | Sets the specified key to the specified value in the local storage. |
-| alt.LocalStorage.delete    | Deletes the specified key from the local storage.                   |
-| alt.LocalStorage.deleteAll | Deletes all keys from the local storage.                            |
-| alt.LocalStorage.save      | Saves the changes to the disk.                                      |
+| alt.LocalStorage.get       | 从本地存储中的指定键获取值。      |
+| alt.LocalStorage.set       | 将指定的键设置为本地存储中的指定值。 |
+| alt.LocalStorage.delete    | 从本地存储中删除指定的键。                   |
+| alt.LocalStorage.deleteAll | 从本地存储中删除所有密钥。                           |
+| alt.LocalStorage.save      | 将更改保存到磁盘。                                    |
 
-## Set a key `.set(key: string, value: any)`
+## 设置一个键 `.set(key: string, value: any)`
 
 ```js
 import * as alt from "alt-client";
 
-alt.LocalStorage.set("testKey", "test"); // Sets the specified key to the specified value in the local storage.
-alt.LocalStorage.save(); // Saves the changes to the disk.
+alt.LocalStorage.set("testKey", "test"); // 将指定的键设置为本地存储中的指定值。
+alt.LocalStorage.save(); // 将更改保存到磁盘。
 ```
 
 ## Get a key `.get(key: string)`
@@ -30,7 +30,7 @@ alt.LocalStorage.save(); // Saves the changes to the disk.
 ```js
 import * as alt from "alt-client";
 
-const testKey = alt.LocalStorage.get('testKey'); // Gets the value from the specified key in the local storage.
+const testKey = alt.LocalStorage.get('testKey'); // 从本地存储中的指定键获取值。
 alt.log('testKey:', testKey)
 ```
 
@@ -39,8 +39,8 @@ alt.log('testKey:', testKey)
 ```js
 import * as alt from "alt-client";
 
-alt.LocalStorage.delete("testKey"); // Deletes the specified key from the local storage.
-alt.LocalStorage.save(); // Saves the changes to the disk.
+alt.LocalStorage.delete("testKey"); // 从本地存储中删除指定的键。
+alt.LocalStorage.save(); // 将更改保存到磁盘。
 ```
 
 ## Delete all keys `.deleteAll()`
@@ -48,13 +48,13 @@ alt.LocalStorage.save(); // Saves the changes to the disk.
 ```js
 import * as alt from "alt-client";
 
-alt.LocalStorage.deleteAll(); // Deletes all keys from the local storage.
-alt.LocalStorage.save(); // Saves the changes to the disk.
+alt.LocalStorage.deleteAll(); // 从本地存储中删除所有密钥。
+alt.LocalStorage.save(); // 将更改保存到磁盘。
 ```
 
-## Example use cases:
+## 示例用例：
 
-- Store dark / light mode preference
-- Store player custom keybindings
-- Store other small player configurations
-- Store last walkingStyle
+- 存储暗/亮模式偏好
+- 存储玩家自定义键绑定
+- 存储其他小型玩家设置
+- 上一次的步行方式

@@ -1,10 +1,10 @@
-# Your first resource
+# 您的第一个资源
 
-This article will explain how to create your first resource.
+本文将解释如何创建您的第一个资源。
 
-## General server structure
+## 通用服务器结构
 
-We'll go on by explaining the general server structure and how to add a resource. 
+我们将继续解释通用服务器结构以及如何添加资源。
 ```
 server/
 ├── cache/
@@ -20,25 +20,25 @@ server/
 ├── server.toml
 ```
 
-Let's create an example resource.
+让我们创建一个示例资源。
 
 ```
-This is the name of your resource:
+这是资源的名称:
 example/
 
-Here go the Client-side Files:
+以下是客户端文件:
 example/client/
 
-Here go the Server-side Files:
+以下是服务端文件：
 example/server/
 
-Here go the configuration & information:
+以下是配置和信息:
 example/resource.toml
 ```
 
-## Configuring the `resource.toml`
+## 配置 `resource.toml`
 
-When you create a resource.toml, it should look like something similar to this:
+当您创建资源时。在toml中，它应该类似于下面这样:
 ```toml
 type = "js"
 main = "server/server.js"
@@ -51,66 +51,66 @@ deps = [
 ]
 ```
 
-**deps** Allows you to require other resources, if they aren't found your resource will fail to load!
+**deps** 允许您请求其他资源，如果没有找到，您的资源将加载失败!
 
-You can access exported functions & more by adding the following in your code: 
+你可以通过在代码中添加以下代码来访问导出的函数及其他:
 ```js
 import * as chat from 'chat';
 ```
 
-**main** is the main server file.
+**main** 是主服务器文件。
 
-**client-main** is the first file loaded on Client-side for a player.
+**client-main** 是客户端为播放器加载的第一个文件。
 
-**client-files** can usually just contain client/* which will load **ALL** files.
+**client-files** 通常只包含 client/*， 它将加载 **所有** 文件.
 
-## Creating serverside code - `server.js`
+## 编写服务器端代码 - `server.js`
 
-Creating Server-side Code - server.js
-We're going to add **chat** as a dependency to our resource.
-Then we're going to import 'alt' and 'chat'. 
+创建服务器端代码 - server.js
+我们将添加 **chat** 作为资源依赖。
+然后我们要导入 'alt' 和 'chat'。
 
 ```js
-// alt:V built-in module that provides server-side API.
+// alt:V内置模块，提供服务器端API。
 import * as alt from 'alt-server';
-// Your chat resource module.
+// 聊天资源模块。
 import * as chat from 'chat';
 
 console.log('==> Your Resource Has Loaded! Horray!');
 
-// Called on Server-side
+// 在服务器端调用
 alt.on('playerConnect', (player) => {
-    // Logs to the console.
+    // 记录日志到控制台。
     alt.log(`==> ${player.name} has connected.`);
 
-    // Displays message to all players.
+    // 向所有玩家显示消息。
     chat.broadcast(`==> ${player.name} has joined.`);
 
-    // Sets the player's model.
+    // 设置玩家模型。
     player.model = 'mp_m_freemode_01';
 
-    // Spawns the player at coordinates x, y, z.
+    // 在坐标x, y, z处生成玩家。
     player.spawn(813, -279, 66);
 
-    // Emit to the player passed, the event name, the argument to send.
+    // 发送给传入的玩家、事件名称、要发送的参数。
     alt.emitClient(player, 'Server:Log', 'hello', 'world');
 });
 ```
-**Congrats you've written your first serverside code!**<br>
-That logs to the console<br>
-Broadcasts to the chat on player join<br>
-Forces the player to have the freeroam model and spawns them<br>
-Emits an event to clientside
+**恭喜你编写了第一个服务端代码!**<br>
+这将会打印到控制台中<br>
+在玩家加入时广播到聊天<br>
+这将使玩家拥有freeroam模型并生成它们<br>
+向客户端发出事件
 
-See the clientside section down below to see how to intercept the event on clientside.
+请参阅下面的客户端部分，了解如何在客户端拦截事件。
 
-## Creating clientside code - `client.js`
+## 创建客户端代码 - `client.js`
 
-We're going to import two essential alt:V dependencies: **natives** and **alt**
+我们将导入两个重要的alt:V依赖:**natives**和**alt**
 ```js
-// alt:V built-in module that provides client-side API.
+// alt:V内置模块，提供客户端API。
 import * as alt from 'alt-client';
-// alt:V built-in module that provides natives API (functions from GTA V).
+// alt:V内置模块，提供native API(函数来自GTA V中)。
 import * as native from 'natives';
 
 alt.log('Client-side has loaded!');
@@ -121,38 +121,39 @@ alt.onServer('Server:Log', (msg1, msg2) => {
 });
 ```
 
-## Usage with typescript
+## 使用 TypeScript
 
-To utilize all the advantages of typescript 2 steps are necessary:
-1) Setup `package.json`
-2) Installing the types
-3) Create a tsconfig file
+要利用TypeScript中的所有优势，需要三个步骤:
+1) 设置 `package.json`
+2) 安装类型
+3) 创建一个tsconfig文件
 
-### Setup package.json
+### 设置 package.json
 
-If your resource does not already have a `package.json`, open a terminal in your resources folder and execute the following commands, depending on your preferred package manager:
+如果你的项目中还没有`package.json `。根据你的偏好，在resources文件夹中打开一个终端并执行以下命令 
+软件包管理器:
 ```
-# For usage with npm
+# 使用npm安装
 npm init
-# For usage with yarn
+# 使用yarn安装
 yarn init
 ```
 
-After following the next wizard, open the package.json with a text editor and add the following entry:
+按照下一个向导操作后，打开`package.json`。使用文本编辑器创建一个Json文件，并添加以下条目:
 
 ```not_json
 {
-    # Here are the values you provided in the assistent
+    # 以下是您在向导中提供的值
     "name": "altv-client",
     ...
-    # Add this line on the bottom
+    # 在底部添加这一行
     "type": module
 }
 ```
 
-### Installing the types
+### 安装类型
 
-| Type                 | Required for    |
+| 类型                 | 用于    |
 |----------------------|-----------------|
 | @altv/types-shared   | Client & Server |
 | @altv/types-client   | Client          |
@@ -160,35 +161,34 @@ After following the next wizard, open the package.json with a text editor and ad
 | @altv/types-webview  | Client          |
 | @altv/types-server   | Server          |
 
-Depending on the required types, these must now be installed. If the project contains scripts for server & client, all types can be installed as well:
+根据所需的类型，这些现在必须安装。如果项目包含服务器和客户端的脚本，则可以安装所有类型的脚本:
 
 ```yaml
-# Client only
-# For usage with npm
+# 仅限客户端
+# 使用npm安装
 npm i -D @altv/types-shared @altv/types-client @altv/types-natives @altv/types-webview
-# For usage with yarn
+# 使用yarn安装
 yarn add -D @altv/types-shared @altv/types-client @altv/types-natives @altv/types-webview
 
-# Server only
-# For usage with npm
+# 仅限服务器端
+# 使用npm安装
 npm i -D @altv/types-shared @altv/types-server
-# For usage with yarn
+# 使用yarn安装
 yarn add -D @altv/types-shared @altv/types-server
 
-# Combined
-# For usage with npm
+# 联合安装
+# 使用npm安装
 npm i -D @altv/types-shared @altv/types-client @altv/types-natives @altv/types-webview @altv/types-shared @altv/types-server
-# For usage with yarn
+# 使用yarn安装
 yarn add -D @altv/types-shared @altv/types-client @altv/types-natives @altv/types-webview @altv/types-shared @altv/types-server
 ```
 
-### Create a tsconfig file
+### 创建一个tsconfig文件
 
-Now create a new file in your resource folder and name it `tsconfig.json` and open it with your favorite text editor.
+现在在资源文件夹中创建一个新文件并将其命名为`tsconfig.json`。然后用你最喜欢的文本编辑器打开它。
 
-Insert the following content and adjust it if necessary.
-Some options are not discussed here, because they are not directly related to alt:V and are already described in detail
-in the [typescript documentation](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html).
+插入以下内容，并根据需要进行调整。
+有些选项在这里不讨论了，因为它们与alt:V没有直接关系，已经详细介绍过了[TypeScript 文档](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html).
 
 ```yaml
 {
@@ -208,12 +208,12 @@ in the [typescript documentation](https://www.typescriptlang.org/docs/handbook/t
     "noImplicitAny": true,
     "sourceMap": false,
 
-    # If you have subfolder where all your ts files are located you can add the following line to specify the root folder 
+    # 如果你有一个子文件夹，所有的ts文件都在其中，你可以添加下面这行来指定根文件夹
     "rootDir": "./Source/",
-    # Here you can set the output folder where the javascript files will be generated
+    # 在这里，你可以设置生成javascript文件的输出文件夹
     "outDir": "./Dist/",
 
-    # Here you specify the TypeScript (IDE) where the alt:V types are located
+    # 在这里指定alt:V类型所在的TypeScript (IDE)
     "typeRoots": ["./node_modules/@altv"]
   },
   "compileOnSave": true,
@@ -226,13 +226,13 @@ in the [typescript documentation](https://www.typescriptlang.org/docs/handbook/t
 }
 ```
 
-## Final Words
+## 最后的话
 
-First of all - Congrats you've written your first clientside code that logs to the 'F8' console => Open the console to see it.
-Followed by setting up a whole server with basic fundamentals!
+首先，恭喜你编写了你的第一个客户端代码，它打印到` F8 `控制台=>打开控制台查看它。
+接下来设置一个具有基础知识的整个服务器!
 
-## Word of advice
+## 忠告
 
-Keep in mind that...
-- alt:V uses ES6 modules
-- the server does not automatically update, you can use something like [altv-pkg](https://github.com/Stuyk/altv-pkg) (unofficial) to easily update server files
+请记住...
+- alt:V 使用ES6模块
+- 服务器不会自动更新，你可以使用类似 [altv-pkg](https://github.com/Stuyk/altv-pkg) (非官方)轻松更新服务器文件

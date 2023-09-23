@@ -1,19 +1,19 @@
-# Shuffle Array
+# 数组洗牌
 
-If you find yourself ever needing to shuffle an array.
+如果你发现自己需要打乱数组。
 
-Here's a simple exported function to shuffle your array.
+这是一个简单的导出函数来打乱数组。
 
 ```js
 export function shuffle(array) {
     var currentIndex = array.length;
     var temporaryValue, randomIndex;
     while (0 !== currentIndex) {
-        // Pick a remaining element...
+        // 选择剩余的元素...
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex -= 1;
 
-        // And swap it with the current element.
+        // 并将其与当前元素交换。
         temporaryValue = array[currentIndex];
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;

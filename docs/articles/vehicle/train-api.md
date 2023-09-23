@@ -1,41 +1,41 @@
-# Train API
+# 列车 API
 
-The Train API has been introduced in version 7.0 and provides properties and methods to control trains. It is part of the serverside vehicle class and synchronized. This article should give you an overview of the API and how to use it.
+7.0版本引入了Train API，提供了属性和方法来控制列车。它是服务器端vehicle类的一部分，并且是同步的。本文将为您概述该API以及如何使用它。
 
-## Properties
+## 属性
 
-| Property Name             | Description                                                                                                                           |
+| 属性名            | 描述                                                                                                                           |
 | ------------------------- | -------------------------------------------------------------------                                                                   |
-| isMissionTrain            | Gets or sets if the created train is a mission train.                                                                                 |
-| trainTrackId              | Gets or sets the track id of the train. [Valid track ids: 0 - 11]                                                                     |
-| trainEngineId             | Gets the engine of the train.                                                                                                         | 
-| trainConfigIndex          | Gets or sets the trains config index. You can find a list of all possible config indices in the trains.xml. [Valid indices: 1 - 25]   |
-| trainDistanceFromEngine   | Gets or sets the distance of the trains to the engine.                                                                                |
-| isTrainEngine             | Gets or sets if the train is the engine of the train.                                                                                 |
-| isTrainCaboose            | Gets or sets if the train is a caboose.                                                                                               |
-| trainDirection            | Gets or sets the direction of the train. (`true` means forward, `false` means backward)                                               |
-| trainPassengerCarriages   | Gets or sets if the train is a passenger carriage.                                                                              |
-| trainRenderDerailed       | Gets or sets if the trains is rendered derailed.                                                                                      |
-| trainForceDoorsOpen       | Gets or sets if the doors of the trains should be forced open.                                                                        |
-| trainCruiseSpeed          | Gets or sets the cruise speed of the train.                                                                                           |
-| trainCarriageConfigIndex  | Gets or sets the config index of the train's carriage.                                                                                |
-| trainLinkedToBackwardId   | Gets or sets another train that is linked to the back of the train.                                                                   |
-| trainLinkedToForwardId    | Gets or sets another train that is linked to the front of the train.                                                                  |
+| isMissionTrain            | 获取或设置创建的列车是否是任务列车。                                                                                 |
+| trainTrackId              | 获取或设置列车的轨道id。[有效id: 0 - 11]                                                                   |
+| trainEngineId             | 获取火车的引擎。   | 
+| trainConfigIndex          | 获取或设置火车的配置索引。你可以在trains.xml中找到所有可能的配置索引列表。   |
+| trainDistanceFromEngine   | 获取或设置火车与引擎之间的距离。                                                                               |
+| isTrainEngine             | 获取或设置火车是否是列车的引擎。                                                                                 |
+| isTrainCaboose            | 如果火车是车尾，获取或设置。                                                                                              |
+| trainDirection            | 获取或设置列车的方向。(`true`表示向前，`false`表示向后)                                              |
+| trainPassengerCarriages   | 获取或设置(如果列车是客运车厢)。                                                                              |
+| trainRenderDerailed       | 获取或设置(如果火车被渲染脱轨)。                                                                                     |
+| trainForceDoorsOpen       | 获取或设置是否应该强行打开列车门。                                                                       |
+| trainCruiseSpeed          | 获取或设置火车巡航速度。                                                                                         |
+| trainCarriageConfigIndex  | 获取或设置列车车厢的配置索引。                                                                                |
+| trainLinkedToBackwardId   | 获取或设置另一列与列车尾部相连的列车。                                                                  |
+| trainLinkedToForwardId    | 获取或设置与列车前端相连的另一列列车。                                                                 |
 
 ## Methods
 
 > [!WARNING]
-> Please keep in mind that these methods will only work when they are used right on spawn.
+> 请记住，这些方法只有在刷出时才有效。
 
-| Method Name                   | Description                                       |
+| 方法名                   | 描述                                       |
 | ----------------------------- | ---------------------------------------------     |
-| setTrainEngineId              | Applying a train as an engine of a train.         |
-| setTrainLinkedToBackwardId    | Links another train to the back of the train.     |
-| setTrainLinkedToForwardId     | Links another train to the front of the train.    |  
+| setTrainEngineId              | 把火车用作火车的引擎。        |
+| setTrainLinkedToBackwardId    | 把另一列火车连接到火车的尾部。     |
+| setTrainLinkedToForwardId     | 将另一列火车连接到列车的前部。    |  
 
-## Example Code
+## 代码示例
 
-The following code creates the metrotrain that drives on track 1. The track goes from the city to Paleto Bay and back.
+下面的代码创建在轨道1上行驶的地铁列车。这条轨道从城市到帕莱托湾，然后返回。
 
 ### Single train
 
@@ -58,12 +58,12 @@ vehicle.setTrainLinkedToBackwardId(null);
 vehicle.setTrainLinkedToForwardId(null);
 ```
 
-### Linked trains
+### 链接火车
 
-In order to link two trains to each other you need to use the `setTrainLinkedToBackwardId` and`setTrainLinkedToForwardId` methods. It is also important that one of the trains needs to be the engine of the train and the other one needs to be the carriage. Otherwise, you need to set the distance of the second train via`trainDistanceFromVehicle` manually.
+为了将两列火车连接起来，你需要使用`setTrainLinkedToBackwardId`和` settrainlinkedtoforwardid `方法。同样重要的是，一列火车需要成为火车的引擎，另一列火车需要成为车厢。否则，你需要手动通过` traindistancefromvehicle `设置第二辆火车的距离。
 
 ```js
-  // The whole train drives on track 3 and starts at the node index 1 of track 3.
+  // 整列火车在轨道3上行驶，从轨道3的节点索引1开始。
   
   let vehicle = new alt.Vehicle(alt.hash("metrotrain"), 193, -603, 16, 0, 0, 0);
   vehicle.isMissionTrain = false;
@@ -71,10 +71,10 @@ In order to link two trains to each other you need to use the `setTrainLinkedToB
   vehicle.setTrainEngineId(null);
   vehicle.trainConfigIndex = 25;
   vehicle.trainDistanceFromEngine = 0;
-  vehicle.isTrainEngine = true; // Make this train the engine of the whole train
+  vehicle.isTrainEngine = true; // 让这列火车成为整列火车的引擎
   vehicle.isTrainCaboose = false;
   vehicle.trainDirection = false;
-  vehicle.trainPassengerCarriages = false; // Disable this train as a passenger carriage
+  vehicle.trainPassengerCarriages = false; // 使这列火车成为乘客车厢
   vehicle.trainRenderDerailed = false;
   vehicle.trainForceDoorsOpen = false;
   vehicle.trainCarriageConfigIndex = 1;
@@ -86,16 +86,16 @@ In order to link two trains to each other you need to use the `setTrainLinkedToB
   vehicle2.setTrainEngineId(vehicle);
   vehicle2.trainConfigIndex = 25;
   vehicle2.trainDistanceFromEngine = 0;
-  vehicle2.isTrainEngine = false; // Disable this train as the engine of the whole train
+  vehicle2.isTrainEngine = false; // 关闭这列火车作为整列火车的引擎
   vehicle2.isTrainCaboose = false;
   vehicle2.trainDirection = false;
-  vehicle2.trainPassengerCarriages = true; // Make this train as a passenger carriage
+  vehicle2.trainPassengerCarriages = true; // 把这列火车当作乘客车厢
   vehicle2.trainRenderDerailed = false;
   vehicle2.trainForceDoorsOpen = false;
   vehicle2.trainCarriageConfigIndex = 1;
   
-  vehicle2.setTrainLinkedToBackwardId(null); // Link no train to the back of this vehicle2
-  vehicle2.setTrainLinkedToForwardId(vehicle); // Link vehicle to the front of the vehicle
-  vehicle.setTrainLinkedToBackwardId(vehicle2); // Link vehicle2 to the back of the vehicle
+  vehicle2.setTrainLinkedToBackwardId(null); // 不要把火车连接到这辆车的后面
+  vehicle2.setTrainLinkedToForwardId(vehicle); // 将车辆连接到车辆的前部
+  vehicle.setTrainLinkedToBackwardId(vehicle2); // 将车辆2连接到车辆的后部
 
 ```

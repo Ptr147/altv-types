@@ -1,6 +1,6 @@
 > [!WARNING]
-> This article is not yet complete.
+> 这篇文章还没有完成。
 
-# Introduction Into Vehicles
+# 车辆介绍
 
-If you want to drive a car, plane or even a boat, you need to create them. The vehicle class in alt:V contains multiple properties and methods that you can use to modify the vehicle instance. To get an overview about the vehicle class, you can check out the typings and the [Train API](train-api.md)
+如果你想驾驶一辆汽车、一架飞机甚至一艘船，你需要创造它们。alt:V中的vehicle类包含多个属性和方法，可以用来修改vehicle实例。要获得关于vehicle类的概述，您可以查看类型和[Train API](train-api.md)

@@ -1,33 +1,33 @@
-# Events
+# 事件
 
-Events work in a very specific way and understanding their communication is very important.
+事件以非常特定的方式工作，了解它们的通信方式非常重要。
 
-The server can communicate with any client.
-Clients may only communicate with WebViews and the server.
+服务器可以与任何客户端通信。
+客户端只能与WebViews和服务器通信。
 
-A client **CANNOT** communicate with another client.
+客户端**不能**与另一个客户端通信。
 
-| Function Name      | Description                                                                                                                                       |
+| 方法名      | 描述                                                                                                                                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| alt.emit              | Emit an event on server or client side. Only received on the side it was emitted from.                                                         |
-| alt.on                | Receives an event. Server only receives server events. Client only receives client events.                                                     |
-| alt.off               | Stop listening to custom or built-in events.                                                                                                   |
-| alt.onServer          | Receives an event emitted from the server on client-side. Triggered with `alt.emitClient`.                                                     |
-| alt.offServer         | Stop listening to custom events from the server.                                                                                               |
-| alt.emitClient        | Emit an event to a specific client or an array of clients that they receive with `alt.onServer`.                                               |
-| alt.emitClientRaw     | Emit an event to a specific client or an array of clients. It works faster than `emitAllClients` that they receive with `alt.onServer`.        |
-| alt.emitAllClients    | Emit an event to all clients that they receive with `alt.onServer`.                                                                            |
-| alt.emitAllClientsRaw | Emit an event to all clients. It works faster than `emitAllClients` that they receive with `alt.onServer`.                                     |
-| alt.onClient          | Receives an event emitted from the client on server-side. Triggered with `alt.emitServer`.                                                     |
-| alt.offClient         | Stop listening to custom events from the client.                                                                                               |
-| alt.emitServer        | Emit an event to the server that is received with `alt.onClient`.                                                                              |
-| alt.emitServerRaw     | (only works, server is using javascript)  Emit an event to the server. It works faster than `emitServer` that they receive with `alt.onClient` |
+| alt.emit              | 在服务器端或客户端发出一个事件，只能在发出方接收到。                                                         |
+| alt.on                | 接收事件。Server只接收服务器事件。Client只接收Client事件。                                                     |
+| alt.off               | 停止监听自定义或内置事件。                                                                                                   |
+| alt.onServer          | 在客户端接收服务器发出的事件。通过`alt.emitClient`触发。                                                     |
+| alt.offServer         | 停止监听来自服务器的自定义事件。                                                                                               |
+| alt.emitClient        | 通过`alt.onServer`向特定的客户端或一组客户端发送事件。                                               |
+| alt.emitClientRaw     | 向指定的客户端或客户端数组发送事件。它比`alt.onServer`接收的`emitAllClients`工作得更快。        |
+| alt.emitAllClients    | 通过`alt.onServer`向所有接收到的客户端发送一个事件。                                                                            |
+| alt.emitAllClientsRaw | 向所有客户端发送事件。它比`alt.onServer`接收的`emitAllClients`工作得更快。                                     |
+| alt.onClient          | 在服务器端接收客户端发出的事件。通过`alt.emitServer`触发。                                                     |
+| alt.offClient         | 停止监听来自客户端的自定义事件。                                                                                               |
+| alt.emitServer        | 通过`alt.onClient`向服务器发送一个事件。                                                                              |
+| alt.emitServerRaw     | (只能正常工作，服务器正在使用javascript)向服务器发送事件。它比`alt.onClient`接收的`emitServer`更快 |
 
-## Server to client
+## 从服务器到客户端
 
-The server may only emit data to the client-side with `emitClient` or `emitClientRaw`, which requires a Player.
+服务器只能通过`emitClient`或`emitClientRaw`向客户端发送数据，这需要一个玩家。
 
-`emitClientRaw` and `emitAllClientsRaw` are used for big data and are faster than `emitClient` or `emitAllClients`.
+`emitClientRaw`和`emitAllClientsRaw`用于大数据，比`emitClient`或`emitAllClients`更快。
 
 
 # [Client-side](#tab/tab1-0)
@@ -39,20 +39,20 @@ alt.onServer('sayHello', () => {
 # [Server-side](#tab/tab1-1)
 ```js
 alt.on('playerConnect', player => {
-    alt.emitClient(player, 'sayHello'); // Send an event to a specific player
+    alt.emitClient(player, 'sayHello'); // 向特定的玩家发送事件
 
-    // Send an event to all players
+    // 向所有玩家发送事件
     alt.emitAllClients('sayHello');
 });
 ```
 ***
 
-## Client to server
+## 从客户端到服务器
 
-The client may only emit data to the server-side with `emitServer` or `emitServerRaw`.
-`emitServerRaw` is used for big data and is faster than `emitServer` and `emitServerRaw` only works, if the server is using javascript.
+客户端只能通过`emitServer`或`emitServerRaw`将数据发送到服务器端。
+`emitServerRaw`用于处理大数据，比`emitServer`更快，并且只有在服务器使用javascript时，`emitServerRaw`才有效。
 
-The server-side `onServer` event handlers will automatically receive the player that sent the event as the first argument.
+服务器端`onServer`事件处理程序将自动接收发送事件的播放器作为第一个参数。
 
 # [Client-side](#tab/tab2-0)
 ```js
@@ -68,10 +68,10 @@ alt.onClient('sayHello', player => {
 ```
 ***
 
-## Server resource to server resource
+## 从服务器资源到另一个服务器资源
 
-The server & client may only communicate with itself with the `on` and `emit` functions.
-They are sent and received across resources as well.
+服务器和客户端只能通过`on`和`emit`函数与自己通信。
+它们也是跨资源发送和接收的。
 
 # [Server-side](#tab/tab3-0)
 ```js
@@ -83,7 +83,7 @@ alt.on('hello', msg => {
 ```
 ***
 
-## Client resource to client resource
+## 从客户端资源到另一个客户端资源
 
 
 # [Client-side](#tab/tab4-0)
@@ -98,7 +98,7 @@ alt.on('hello', msg => {
 
 ## Client to WebView and back
 
-**Note:** `resource` in the URL of the WebView refers to the resource that you are currently writing code for.
+**Note:** `resource` 在WebView的URL中引用您正在为之编写代码的资源。
 
 # [Client-side code](#tab/tab5-0)
 ```js
@@ -134,7 +134,7 @@ alt.setTimeout(() => {
 ```
 ***
 
-## Unsubscribes from events
+## 取消订阅事件
 
 # [alt.off(Server-side/Client-side)](#tab/tab6-0)
 ```js
@@ -159,14 +159,14 @@ function customEventFunction() {
 ```
 ***
 
-## Raw Events
+## 原始事件
 
-Raw events serialize the values to their raw byte buffer representation instead of converting them to an intermediate value, because of this the raw events can serialize and send big objects / arrays a lot faster than the normal events, BUT the downside is that this only works when both sides are using JavaScript.
+原始事件将值序列化为原始字节缓冲区表示，而不是将它们转换为中间值，因此原始事件可以比普通事件更快地序列化和发送大对象/数组，但缺点是这仅在双方都使用JavaScript时有效。
 
-Think of them as "native" JavaScript events, they can send almost any JS built-in data structure, such as `Set`, `Map`, `Date`, etc. and without limits (for example, BigInt of any size).
+可以把它们看作是“原生”的JavaScript事件，它们可以发送几乎任何JS内置的数据结构，例如`Set`， `Map`， `Date`等，并且没有限制(例如，任何大小的BigInt)。
 
 > [!CAUTION]
-> `alt.emitServerRaw` only works if the server is using javascript.
+> `alt.emitServerRaw` 仅当服务器使用javascript时有效。
 
 # [Server-side(emitClientRaw or emitAllClientsRaw)](#tab/tab7-0)
 ```js
@@ -175,9 +175,9 @@ alt.on('playerConnect', player => {
         { id: 0, name: "test1" },
         { id: 1, name: "test2" }
     ]
-    alt.emitClientRaw(player, 'sayHello', array); // Send an event to a specific player
+    alt.emitClientRaw(player, 'sayHello', array); // 向特定的玩家发送事件
 
-    // Send an event to all players
+    // 向所有玩家发送事件
     alt.emitAllClientsRaw('sayHello', array);
 });
 ```

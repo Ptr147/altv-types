@@ -1,70 +1,52 @@
-# Setup VSCode for your project
+# 为你的项目配置VSCode
 
-In this article we'll focus on configuration and creation of simple node
-built-in scripts.
+在本文中，我们将重点介绍简单节点的配置和创建内置的脚本。
 
 > [!WARNING]
-> This article is still a work in progress.
+> 这篇文章仍在进行中。
 
-## Downloading VSCode
+## 下载 VSCode
 
-Before we start, we need downloaded and installed software, so in case
-you didn't download yet, [here](https://code.visualstudio.com/#alt-downloads)
-you can find all download types for different platforms. By the time I'm writing
-this article, I'm using Windows portable package.
+在我们开始之前，我们需要下载和安装软件, 所以以防万一你还没有下载，
+[这里](https://code.visualstudio.com/#alt-downloads)你可以找到不同平台的所有下载类型。在本文中，我使用的是Windows便携包。
 
-## Choose language and model
+## 选择语言和模型
 
-Now, you're left with decision to go with JavaScript or TypeScript. I'll
-cover configuration for both of them, but if you don't know which one to
-choose and you're ok with familiarising yourself with additional features
-that TypeScript implements, you should definitely choose it.
-Also it'd be good to know if you're creating project for client-side/server-side
-model or both (will be mentioned later).
+现在，你需要决定是使用JavaScript还是TypeScript。我会为两者提供配置，但如果你不确定该选择哪个，并且愿意了解TypeScript实现的附加功能，你应该选择TypeScript。
+另外，了解你是为客户端、服务器端模型还是两者都创建项目会很有帮助（稍后会提及）。
 
 ## Preparing folder for project
 
-In VSCode click File -> Open Folder, this option will open File Dialog.
-Create folder in your preferred directory and select folder which you've
-just created. All project files will be stored in that folder.
+在VSCode中单击文件->打开文件夹，此选项将打开文件对话框。
+在您的首选目录中创建文件夹，并选择您刚刚创建的文件夹
+。所有项目文件都将存储在该文件夹中。
 
 > [!CAUTION]
-> Always open your project as folder instead of single files.
+> 始终将项目作为文件夹打开，而不是单个文件。
 
-## Creating node package
+## 创建node包
 
-Now we'll cover using Terminal feature for executing shell scripts in your
-project folder. To open it, click View -> Terminal, which will show docked
-window at the bottom of the editor. Terminal will use default shell in your
-system (for Windows 10 it's PowerShell). Any possible differences in my shell
-scripts will be mentioned.
+现在我们将介绍如何在项目文件夹中使用终端功能来执行shell脚本。要打开它，请单击"View" -> "Terminal"，这将在编辑器底部显示停靠窗口。终端将使用你系统中的默认shell（对于Windows 10，它是PowerShell）。我会提及可能存在的shell脚本差异。
 
-Now execute this script in Terminal
+现在在终端中执行这个脚本
 ```powershell
 npm init --yes
 ```
-It will create default package configuration file without asking any
-questions. You can fill them up later.
+它将创建默认的包配置文件，无需询问任何问题。你可以稍后填写它们。
 
-Now you can install types definitions for your chosen model, which will
-be used by editor for code validation, auto-completion etc.
-Check out [this](https://github.com/altmp/altv-types/blob/master/README.md#altv-types)
-document for up-to-date information.
+现在你可以安装所选择模型的类型定义，这将被编辑器用于代码验证、自动补全等功能。请查看此[文档](https://github.com/altmp/altv-types/blob/master/README.md#altv-types)获取最新信息。
 
-If you've chosen TypeScript language for your project, you also need to
-install TypeScript package
+
+如果你选择了TypeScript语言作为项目的开发语言，你还需要安装TypeScript包。
 ```powershell
 npm i -D typescript
 ```
 
-## Creating configuration
+## 创建配置
 
-If you've chosen JavaScript project, your configuration file should be
-named ``jsconfig.json`` and for TypeScript project ``tsconfig.json``.
-Both are similiar, so if you change your mind later, it won't be hard to
-switch later.
+如果你选择了JavaScript项目，你的配置文件应该命名为 jsconfig.json；如果是TypeScript项目，则应为 tsconfig.json。两者都类似，所以如果你改变主意，稍后切换也不会很困难。
 
-Your configuration file should have content as below
+配置文件的内容应该如下所示
 ```json
 {
     "compilerOptions": {
@@ -83,15 +65,14 @@ Your configuration file should have content as below
 ```
 
 > [!TIP]
-> Notice ``typeRoots`` entry, it's necessary for alt:V types to work
-> without manually defining every package. If you desire to minimise
-> used packages to minimum, use ``types`` entry instead.
+> 注意`` typeoots ``条目，它是alt:V类型生效的必要条件。
+> 无需手动定义每个包，如果你希望将使用的包最小化，
+> 请改用 types 条目。
 
-## First project script
+## 第一个项目脚本
 
-Now we can create our first script, which should be named ``index.js``
-(as described in ``package.json``).
-To test if it all works properly, you can copy this code below
+现在我们可以创建我们的第一个脚本，应该命名为 index.js（如package.json中所描述）。
+为了测试是否一切正常运作，你可以复制下面的这段代码。
 ```js
 import * as alt from "alt-client";
 
@@ -101,14 +82,10 @@ alt.setInterval(() => {
 ```
 
 > [!WARNING]
-> If you're creating server-side script, you may get error mentioning that
-> module ``alt-client`` cannot be found. In this case just change it to ``alt-server``.
+> 如果你正在创建服务器端脚本，可能会出现错误，提示找不到模块 `alt-client`。在这种情况下，只需将其更改为 `alt-server`。
 
-If all went well, you shouldn't get any errors in your script as well as
-when typing ``alt.`` you should get auto-completion for all available types
-in that module.
+如果一切顺利，你的脚本不应出现任何错误，同时在输入 ``alt.`` 时，你应该能够获得该模块中所有可用类型的自动补全。
 
-## Creating resource configuration
+## 创建资源配置
 
-For this project to be recognised by a language module, we need to create
-resource configuration file. You can check [here](https://docs.altv.mp/js/articles/create-your-first-resource.html#configuring-the-resourcecfg) for how to proceed.
+要使该项目被语言模块识别，我们需要创建资源配置文件。你可以在[这里](https://docs.altv.mp/js/articles/create-your-first-resource.html#configuring-the-resourcecfg)查看如何操作。

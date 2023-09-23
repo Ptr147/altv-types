@@ -1,41 +1,41 @@
-# Introduction to the Player
+# 玩家介绍
 
-The player is you. You are the player. Your friend is the player. Everyone is the player.
+玩家就是你。你是玩家。你的朋友是玩家。每个人都是玩家。
 
-Player's also come with plenty of properties and functions. Player is most often accessed through events.
+玩家也带有大量的属性和功能。玩家最常通过事件进行访问。
 
-Meaning an event will give you access to a player instance depending on the behavior from the player.
+这意味着根据玩家的行为，事件将允许你访问玩家实例。
 
-## Player Properties
+## 玩家属性
 
-Here are some very commonly used properties.
+下面是一些非常常用的属性。
 
-This documentation may not reflect all properties available on the player.
+此文档可能不能反映玩家可用的所有属性。
 
-### Server Side
+### 服务器端
 
-| Property Name | Description                                                               |
+| 属性名 | 描述                                                               |
 | ------------- | ------------------------------------------------------------------------- |
-| armour        | Set player armour. 0 - 100                                                |
-| currentWeapon | Get player's current weapon.                                              |
-| dimension     | Player's Virtual World. 0 By Default                                      |
-| health        | Set player's health. 100-200                                              |
-| hwidHash      | Unique Hardware Hash                                                      |
-| hwidExHash    | Unique Ex Hardware Hash                                                   |
-| id            | Their server-side id                                                      |
-| ip            | Their IP Address                                                          |
-| model         | Read or set the player's model.                                           |
-| name          | Readonly Player Set Name                                                  |
-| ping          | Current Ping                                                              |
-| pos           | Current Player Position                                                   |
-| vehicle       | If a vehicle is present this lets you get that vehicle. Null otherwise.   |
-| socialID      | A non-unique spoofable social club id. Don't use this for identification. |
-| valid         | A way to determine if the entity still exists.                            |
+| armour        | 设置玩家护甲。 0 - 100                                                |
+| currentWeapon | 获得玩家当前的武器。                                              |
+| dimension     | 玩家的虚拟世界。默认为0                                     |
+| health        | 设置玩家生命值。 100-200                                              |
+| hwidHash      | 唯一硬件散列                                                     |
+| hwidExHash    | 唯一的Ex硬件hash                                                  |
+| id            | 他们的服务器端id                                                    |
+| ip            | 他们的IP地址                                                         |
+| model         | 读取或设置玩家模型                                         |
+| name          | 只读玩家设置名称                                                  |
+| ping          | 当前Ping                                                             |
+| pos           | 当前玩家坐标                                                  |
+| vehicle       | 如果有一辆车，你就可以得到那辆车对象。否则NULL。   |
+| socialID      | 一个非唯一的social club id。不要用它来识别身份。 |
+| valid         | 一种确定实体是否仍然存在的方法。                            |
 
-### Client Side
+### 客户端
 
-| Property Name | Description                                                         |
+| 属性名 | 描述                                                         |
 | ------------- | ------------------------------------------------------------------- |
-| pos           | The player's position. If exiting stream range, position is frozen. |
-| vehicle       | The player's vehicle if they're in one. Null if otherwise.          |
-| scriptID      | The ped handle of the player. Used for working with natives.        |
+| pos           | 玩家的位置。如果退出流范围，位置被冻结。 |
+| vehicle       | 玩家的车辆，如果他们在其中。否则为Null。         |
+| scriptID      | 玩家的角色句柄。用于与本地函数交互。        |

@@ -1,12 +1,12 @@
-# Math & Distance Utility Functions
+# 数学和距离效用函数
 
-alt:V by default does not come with default functions for getting distance.
+默认情况下，alt:V没有默认的获取距离的函数。
 
-Use these functions on server-side or client-side.
+在服务器端或客户端使用这些函数。
 
 ```js
 /**
- * Get all players in a certain range of a position.
+ * 获取特定位置范围内的所有玩家。
  * @param  {} pos
  * @param  {} range
  * @param  {} dimension=0
@@ -23,7 +23,7 @@ export function getPlayersInRange(pos, range, dimension = 0) {
 }
 
 /**
- * Get the forward vector of a player.
+ * 获取玩家的前方向量。
  * @param  {} rot
  * @returns {{x,y,z}}
  */
@@ -39,8 +39,8 @@ export function getForwardVectorServer(rot) {
 }
 
 /**
- * Get the distance from one vector to another.
- * Does take Z-Axis into consideration.
+ * 求两个向量之间的距离。
+ * 将z轴考虑在内。
  * @param  {} vector1
  * @param  {} vector2
  * @returns {number}
@@ -56,8 +56,8 @@ export function distance(vector1, vector2) {
 }
 
 /**
- * Get the distance from one vector to another.
- * Does not take Z-Axis into consideration.
+ * 求两个向量之间的距离。
+ * 没有考虑z轴。
  * @param  {} vector1
  * @param  {} vector2
  * @returns {{x,y,z}}
@@ -71,7 +71,7 @@ export function distance2d(vector1, vector2) {
 }
 
 /**
- * Check if a position is between two vectors.
+ * 检查某个位置是否位于两个向量之间。
  * @param  {} pos
  * @param  {} vector1
  * @param  {} vector2
@@ -84,7 +84,7 @@ export function isBetween(pos, vector1, vector2) {
 }
 
 /**
- * Get a random position around a position.
+ * 在一个位置周围随机选择一个位置。
  * @param  {} position
  * @param  {} range
  * @returns {{x,y,z}}
@@ -98,7 +98,7 @@ export function randomPositionAround(position, range) {
 }
 
 /**
- * Get the closest vector from a group of vectors.
+ * 从一组向量中找出最近的向量。
  * @param  {alt.Vector3} pos
  * @param  {Array<{x,y,z}> | Array<{pos:alt.Vector3}} arrayOfPositions
  * @returns {Array<any>}
@@ -116,7 +116,7 @@ export function getClosestVectorFromGroup(pos, arrayOfPositions) {
 }
 
 /**
- * Get the closest player to a player.
+ * 获取距离当前玩家最近的一个玩家
  * @param  {} player
  * @returns {Array<alt.Player>}
  */
@@ -125,7 +125,7 @@ export function getClosestPlayer(player) {
 }
 
 /**
- * Get the closest vehicle to a player.
+ * 找到离玩家最近的车辆。
  * @param  {alt.Vector3} player
  * @returns {Array<alt.Vehicle>}
  */
@@ -134,7 +134,7 @@ export function getClosestVehicle(player) {
 }
 ```
 
-## Example Usage
+## 示例用法
 
 ```js
 const dist1 = { x: 5, y: 2, z: 0 };

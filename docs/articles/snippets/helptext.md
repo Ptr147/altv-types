@@ -1,8 +1,8 @@
-# Help Text
+# 帮助文本
 
-Help text is the little box that appears in the upper left corner of your game.
+帮助文本是出现在游戏左上角的小框。
 
-You cannot change the position of this text.
+你不能改变这个文本的位置。
 
 **Client Side**
 

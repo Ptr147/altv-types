@@ -1,14 +1,14 @@
-# Prototyping
+# 原型
 
-Prototyping allows you to extend default class functionality for Player's, Vehicle's, etc.
+原型设计允许你扩展玩家、车辆等的默认类功能。
 
-It is important to understand that all Prototype files should be loaded immediately after your database initialization.
+有一点很重要，所有的原型文件都应该在数据库初始化后立即加载。
 
-Granted your Prototype has database features.
+假设你的原型具有数据库功能。
 
-They do **NOT** work in multiple resources. Single resource only.
+它们**不能**在多个资源中工作。只有一个资源。
 
-This means that the data for a prototype is **non-transferrable** between resources.
+这意味着原型的数据在资源之间是**不可转移**的。
 
 ### JavaScript Server Side Example
 
@@ -87,19 +87,19 @@ alt.Player.prototype.addCash = function addCash(value) {
 ### Typescript Server Side Example
 
 ```ts
-// Use `alt-client` to do prototyping on client-side.
+// 使用`alt-client`在客户端进行原型设计。
 declare module 'alt-server' {
     export interface Player {
         cash?: number;
         bank?: number;
 
-        // You must declare your function interfaces.
+        // 必须声明函数接口。
         addToCash(value: number): boolean;
         addToBank(value: number): boolean;
     }
 }
 
-// Then you can define your prototype functions.
+// 然后你可以定义原型函数。
 alt.Player.prototype.addToCash = function addToCash(value: number) {
     if (!this.cash) {
         this.cash = value;

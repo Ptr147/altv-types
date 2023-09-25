@@ -1,10 +1,10 @@
-# Encryption / Password Hashing
+# 加密 / 密码散列
 
-This requires a library called `sjcl`.
+这需要引入一个名为`sjcl`的库。
 
-This will let you perform a PBKDF2 encryption.
+这将允许您执行PBKDF2加密。
 
-You can install it in your package.json by doing: `npm install sjcl`
+你可以在包中安装它。通过执行`npm install sjcl`命令获取Json
 
 **Server Side**
 
@@ -12,9 +12,9 @@ You can install it in your package.json by doing: `npm install sjcl`
 import sjcl from 'sjcl';
 
 /**
- * Hash a password with pbkdf2
+ * 用pbkdf2散列密码
  * @param {string} password
- * @returns {string} A password hash.
+ * @returns {string} 密码hash.
  */
 export function encryptPassword(password) {
     const saltBits = sjcl.random.randomWords(2, 0);
@@ -24,10 +24,10 @@ export function encryptPassword(password) {
 }
 
 /**
- * Verify a password matches with pbkdf2.
+ * 验证密码是否与pbkdf2匹配。
  * @param {string} password
  * @param {string} storedPasswordHash
- * @returns {bool} true if correct password
+ * @returns {bool} 如果密码正确，返回true
  */
 export function verifyPassword(password, storedPasswordHash) {
     const [_key, _salt] = storedPasswordHash.split('$');
@@ -43,7 +43,7 @@ export function verifyPassword(password, storedPasswordHash) {
 }
 
 /**
- * Generate a hash based on string.
+ * 基于字符串生成哈希。
  * @param {string} data
  */
 export function generateHash(data) {
@@ -52,7 +52,7 @@ export function generateHash(data) {
 }
 
 /**
- * Generate a persistent hash based on string.
+ * 基于string生成持久哈希。
  * @param {string} data
  */
 export function persistentHash(data) {

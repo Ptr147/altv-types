@@ -1,25 +1,25 @@
-# Voice (Utilize alt:V´s built in Voice)
+# 语音(利用alt:V’s内置语音)
 
-alt:V by default has a built in Voice functionality and this is how you can use it.
+alt:V默认有内置的语音功能，这就是你如何使用它。
 
-This voice can be used for 3D or 2D Voice solutions to ship features like:
+这种声音可以用于3D或2D语音解决方案，以实现以下功能:
 
--   3D & 2D Voicechat
--   Phonecalls
--   Radio communication
--   much more
+-   3D和2D语音聊天
+-   电话通话
+-   无线电通信
+-   更多
 
-**The snippet below will show you how to implement 3D voice for roleplay servers with javascript class usage**
+**下面的代码片段将向您展示如何使用javascript类为角色扮演服务器实现3D语音**
 
-## Functional Explanation
+## 函数解释
 
-Quick explanation for what voice functionality is available through the alt:V API
+快速解释什么语音功能是可用的alt:V API
 
-**Player properties (clientside)**
+**玩家属性(客户端)**
 
-`isTalking` boolean - which will be true if player is talking
+`isTalking` boolean - 如果该玩家在说话，则为true
 
-`micLevel` number - player talking volume
+`micLevel` number - 玩家说话音量
 
 ```js
 import * as alt from 'alt-client';
@@ -31,19 +31,19 @@ alt.log('Player talking volume: ' + localPlayer.micLevel);
 
 **VoiceChannel Class**
 
-`new VoiceChannel(isSpatial: boolean, maxDistance: number)` constructor - isPatial false means global voice channel,isPatial true means 3D voice channel which uses maxDistance as range
+`new VoiceChannel(isSpatial: boolean, maxDistance: number)` constructor - 空间false是指全局语音信道，空间true是指以最大距离为范围的三维语音信道
 
-`addPlayer(player: alt.Player)` function - adds a player to the specific channel
+`addPlayer(player: alt.Player)` function - 将玩家添加到特定频道
 
-`removePlayer(player: alt.Player)` function - removes a player to the specific channel
+`removePlayer(player: alt.Player)` function - 将玩家移动到特定频道
 
-`mutePlayer(player: alt.Player)` function - mute the player inside the specific channel
+`mutePlayer(player: alt.Player)` function - 使特定通道内的玩家静音
 
-`unmutePlayer(player: alt.Player)` function - unmute the player inside the specific channel
+`unmutePlayer(player: alt.Player)` function - 取消特定频道内的播放器静音
 
-`isPlayerInChannel(player: alt.Player)` function - checks if the player is already in the specific channel
+`isPlayerInChannel(player: alt.Player)` function - 检查玩家是否已经在特定频道中
 
-`isPlayerMuted(player: alt.Player)` function - checks if the player is muted in the specific channel
+`isPlayerMuted(player: alt.Player)` function - 检查玩家在特定频道是否静音
 
 ```js
 import * as alt from 'alt-server';
@@ -59,7 +59,7 @@ alt.on('playerDisconnect', player => {
 });
 
 alt.on('playerDeath', player => {
-    //mute player in testchannel if dead and connected to voice
+    //在testchannel中静音播放器，如果已死亡并连接到语音
     if (testChannel.isPlayerInChannel(player) && !testChannel.isPlayerMuted(player)) {
         testChannel.mutePlayer(player);
     }
@@ -87,21 +87,21 @@ class AltvVoiceServerModule {
     }
 
     registerEvents() {
-        //alternatively call it after player succesfully spawned after authentication
+        //或者在玩家认证后成功生成后调用它
         alt.on('playerConnect', player => {
             this.addToVoiceChannels(player);
             this.changeVoiceRange(player);
         });
-        //handle player disconenct
+        //处理玩家断开连接
         alt.on('playerDisconnect', this.removePlayerFromChannels.bind(this));
-        //handle player gamecrash/entity invalidity
+        //处理玩家游戏崩溃/实体失效
         alt.on('removeEntity', this.removePlayerFromChannels.bind(this));
-        //handle player voicerange change
+        //处理玩家语音变化
         alt.onClient('server:ChangeVoiceRange', this.changeVoiceRange.bind(this));
     }
 
     /**
-     * clear channels for given player
+     * 清除给定玩家的通道
      * @param  {alt.Player} player
      * @returns {null}
      */
@@ -118,7 +118,7 @@ class AltvVoiceServerModule {
     }
 
     /**
-     * add player to all voice channels
+     * 添加播放器到所有语音频道
      * @param  {alt.Player} player
      * @returns {null}
      */
@@ -129,7 +129,7 @@ class AltvVoiceServerModule {
     }
 
     /**
-     * mute player in all voice channels
+     * 静音播放器在所有语音频道
      * @param  {alt.Player} player
      * @returns {null}
      */
@@ -140,7 +140,7 @@ class AltvVoiceServerModule {
     }
 
     /**
-     * takes a range for a player and mutes this player in all channels he shouldn´t be heard
+     * 针对玩家指定范围，在所有不能听到他的频道中将其静音。
      * @param  {alt.Player} player
      * @param  {number} range
      * @returns {null}
@@ -165,7 +165,7 @@ class AltvVoiceServerModule {
     }
 
     /**
-     * change the voice range of the given player and unmute in new range channel
+     * 更改给定玩家的语音范围并在新范围的频道中取消静音。
      * @param  {alt.Player} player
      * @returns {null}
      */
@@ -203,7 +203,7 @@ class AltvVoiceServerModule {
     }
 }
 
-//initilize voice class instance
+//初始化语音类实例
 export const AltvVoiceServerModuleInstance = new AltvVoiceServerModule();
 ```
 
@@ -216,13 +216,13 @@ import * as alt from 'alt-client';
 
 class AltvVoiceClientModule {
     constructor() {
-        //localPlayer object shortcut
+        //localPlayer对象的快捷方式
         this.localPlayer = alt.Player.local;
-        //interval to check state changes
+        //检查状态变化的时间间隔
         this.interval = null;
-        //cached talking state
+        //缓存通话状态
         this.talkingState = false;
-        //cached voice range
+        //缓存语音范围
         this.currentRange = 0;
         this.registerEvents();
         alt.log('AltvVoiceClientModule init');
@@ -231,7 +231,7 @@ class AltvVoiceClientModule {
     registerEvents() {
         alt.on('keydown', key => {
             if (key == 107) {
-                //Press Num+ to change the range in which you get heard by other players
+                //按下Num+来改变你被其他播放器听到的音域
                 alt.emitServer('server:ChangeVoiceRange');
             }
         });
@@ -251,23 +251,23 @@ class AltvVoiceClientModule {
     }
 
     /*
-     * interval to handle talking state changes
-     * i.e show in your ui if this player is talking (like ts3 voice led)
+     * 处理通话状态变化的间隔时间
+     * i.e 显示在你的UI，如果这个玩家正在说话(像ts3语音led)
      */
     registerTalkingInterval() {
         this.interval = alt.setInterval(() => {
-            //only emit if state changed
+            //仅当状态改变时触发 
             if (this.talkingState !== this.localPlayer.isTalking && this.currentRange !== 0) {
                 this.talkingState = this.localPlayer.isTalking;
-                //emit talking state change to your ui {this.talkingState}
+                //将对话状态更改到ui {this.talkingState}
             }
             if (this.talkingState && this.currentRange === 0) {
-                //emit talking state change to your ui {false}
+                //将对话状态更改为UI {false}
             }
         }, 444);
     }
 }
 
-//initilize voice class instance
+//初始化语音类实例
 export const AltvVoiceClientModuleInstance = new AltvVoiceClientModule();
 ```

@@ -1,10 +1,10 @@
-# Notifications
+# 通知
 
-Notifications are the black boxes that appear above your map on bottom left-hand side.
+通知是出现在地图左下角上方的黑盒子。
 
-They are only accessible from client-side but you can call them from server-side.
+它们只能从客户端访问，但你可以从服务器端调用它们。
 
-See the example below on how to utilize this in two different ways.
+请参阅下面的示例，了解如何以两种不同的方式利用它。
 
 **Client Side**
 

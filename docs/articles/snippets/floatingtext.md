@@ -1,7 +1,7 @@
-# Floating text
+# 浮动文本
 
-This function shows a floating notification with a message. 
-This function allows you displaying button inputs, see this [list](https://pastebin.com/HPg8pYwi)
+这个函数显示一个带有消息的浮动通知。
+这个函数允许你显示按钮输入，参见 [列表](https://pastebin.com/HPg8pYwi)
 
 **Client Side**
 

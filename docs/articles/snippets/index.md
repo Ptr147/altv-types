@@ -1,5 +1,5 @@
-# About Snippets
+# 关于片段
 
-These are general snippets that will assist with understanding some functionality for server building.
+这些是一般的代码片段，有助于理解服务器构建的一些功能。
 
-Use the sidebar on the left to browse the snippets in the cookbook.
+使用左侧的侧边栏浏览食谱中的代码片段。

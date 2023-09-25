@@ -1,82 +1,79 @@
-# Workers
+# 工人
 
-## What are the alt:V Workers
+## 什么是alt:V工人
 
-The alt:V workers implementation is very similar to the NodeJS one as it allows you to run javascript code in parallel in another thread.
-Workers (threads) are useful for performing CPU-intensive operations, while they aren't any big help with I/O-intensive work.
-The V8 asynchronous I/O operations are more efficient than Workers can be.
+alt:V中的workers实现与NodeJS非常相似，因为它允许你在另一个线程中并行运行JavaScript代码。Workers（线程）对于执行CPU密集型操作非常有用，但对于I/O密集型工作并没有太大帮助。V8引擎的异步I/O操作比Workers更高效。
 
-### Important notes
+### 重要提示
 
-* Natives are not accessible in workers
-* Creating a worker thread won't make your code perform better, it will just offload it in another thread
+* 在Workers中无法访问Native函数。
+* 创建一个worker线程并不会让你的代码运行更快，它只是将任务分配到另一个线程中
 
-## Usage
+## 用法
 
 > [!CAUTION]
-> In order to be able to use the alt:V Worker API, you must import it via ``import * as alt from alt-worker``. You can find the whole worker class api [here](https://docs.altv.mp/js/api/alt-client.Worker.html)
+> 为了能够使用alt:V Worker API，你必须通过 ``import * as alt from alt-worker`` 进行导入。你可以在[这里](https://docs.altv.mp/js/api/alt-client.Worker.html)找到整个Worker类的API。
+### worker中可用的类
 
-### Classes available in a worker
-
-Only the following client-side alt API classes that are thread safe are available in a Worker:
+只有以下是线程安全的客户端alt API类可在Worker中使用：
 
 * alt.File
 * alt.RGBA
 * alt.Vector2
 * alt.Vector3
 
-### Functions available in a worker
+### worker中可用的函数
 
-In the alt:V context, basics like ``setInterval`` or ``console.log`` don't exist. That's why we expose our own functions for it, but to make it easier if you do ``setInterval`` or ``console.log`` it will call the corresponding alt method.
+在alt:V环境中，诸如 ``setInterval`` 或 ``console.log`` 等基本功能是不存在的。这就是为什么我们会为它们暴露我们自己的函数，但为了更方便，如果你使用 ``setInterval`` 或 ``console.log``，它将调用相应的alt方法。
 
-| Function Name     | Description                                                                                                     |
+| 方法名     | 描述                                                                                                     |
 | ----------------- | --------------------------------------------------------------------------------------------------------------- |
-| alt.emit                 | Emit an event to the client side.                                                                        |
-| alt.on                   | Receives an event emitted from the client side.                                                          |
-| alt.once                 | Receives an event emitted from the client-side. Once triggered the handler is destroyed.                 |
-| alt.log                  | Logs the specified arguments to the console using alt:V logger. (gets printed in the client logs files). |
-| alt.logWarning           | Logs the specified arguments as a warning to the console using alt:V logger.                             |
-| alt.logError             | Logs the specified arguments as an error to the console using alt:V logger.                              |
-| alt.nextTick             | Schedules execution of handler on next tick/next frame.                                                  |
-| alt.setInterval          | Schedules execution of handler in specified intervals.                                                   |
-| alt.setTimeout           | Schedules execution of handler once after the expiration of interval.                                    |
-| alt.clearNextTick        | Clears a timer set with the nextTick function.                                                           |
-| alt.clearInterval        | Clears a timer set with the setInterval function.                                                        |
-| alt.clearTimeout         | Clears a timer set with the setTimeout function.                                                         |
-| alt.hash                 | Creates a hash using Jenkins one-at-a-time algorithm.                                                    |
-| alt.getSharedArrayBuffer | Retrieves the shared array buffer instance with the given id.                                            |
+| alt.emit                 | 向客户端发送一个事件 side.                                                                        |
+| alt.on                   | 接收从客户端发出的事件 side.                                                          |
+| alt.once                 | 接收从客户端发出的事件。一旦触发，处理程序将被销毁。                 |
+| alt.log                  | 使用alt:V日志记录器将指定的参数记录到控制台（会打印到客户端日志文件中）。 |
+| alt.logWarning           | 使用alt:V日志记录器将指定的参数记录为控制台警告。                   |
+| alt.logError             | 使用alt:V日志记录器将指定的参数记录为控制台错误。                              |
+| alt.nextTick             | 安排在下一帧/下一tick上执行处理程序。                                                  |
+| alt.setInterval          | 安排以指定间隔执行处理程序。                                                   |
+| alt.setTimeout           | 安排处理程序在间隔到期后执行一次。                                   |
+| alt.clearNextTick        | 清除使用nextTick函数设置的定时器。                                                           |
+| alt.clearInterval        | 清除使用setInterval函数设置的定时器。                                                        |
+| alt.clearTimeout         | 清除使用setTimeout函数设置的定时器。                                                         |
+| alt.hash                 | 使用Jenkins one-at-a-time算法创建哈希。                                 |
+| alt.getSharedArrayBuffer | 检索具有给定ID的共享数组缓冲实例。                                            |
 
-### Properties available in a worker
+### worker中可用的属性
 
-| Property Name  | Description                               |
+| 属性名  | 描述                               |
 | -------------- | ----------------------------------------- |
-| alt.version    | Represents the current version.           |
-| alt.branch     | Represents the current branch.            |
-| alt.sdkVersion | Represents the current SDK version.       |
-| alt.debug      | Returns if the resource is in debug mode. |
+| alt.version    | 表示当前版本。          |
+| alt.branch     | 表示当前分支。            |
+| alt.sdkVersion | 表示当前SDK版本。      |
+| alt.debug      | 返回资源是否处于调试模式。 |
 
-### How to create a worker
+### 如何创建worker
 
-# [relative path](#tab/tab1-0)
+# [相对路径](#tab/tab1-0)
 ```js
 import * as alt from 'alt-client';
 
 const worker = new alt.Worker('./worker.js');
 worker.start();
 ```
-# [absolute path](#tab/tab1-1)
+# [绝对路径](#tab/tab1-1)
 ```js
 import * as alt from 'alt-client';
 
-// Path starting from the resource root directory
+// 从资源根目录开始的路径
 const worker = new alt.Worker('/client/worker.js');
 worker.start();
 ```
 ***
 
-## Built-in worker events
+## 内置worker事件
 
-### Knowing when the worker is loaded
+### 了解worker加载完成时机
 
 ```js
 worker.on('load', () => {
@@ -84,7 +81,7 @@ worker.on('load', () => {
 });
 ```
 
-### Error handling
+### 错误处理
 
 ```js
 worker.on('error', (error) => {
@@ -92,7 +89,7 @@ worker.on('error', (error) => {
 });
 ```
 
-### Communicating from the client to the Worker
+### 从客户端向Worker进行通信
 
 # [client](#tab/tab2-0)
 ```js
@@ -113,7 +110,7 @@ alt.on('eventName', (...args) => {
 ```
 ***
 
-### Communicating from the worker to the client
+### 从Worker向客户端进行通信
 
 # [worker](#tab/tab3-0)
 ```js
@@ -133,17 +130,17 @@ worker.on('eventName', (...args) => {
 ```
 ***
 
-### Using shared array buffers
+### 使用共享数组缓冲区
 
-An [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) is an object used to represent a generic, fixed-length raw binary data buffer.
-It is an array of bytes, you cannot directly manipulate its content but create a [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) object / [DataView](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView) to read and write the buffer content.
+[ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) 是用于表示通用、固定长度的原始二进制数据缓冲区的对象。
+它是字节的数组，你不能直接操作其内容，但可以创建 [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) 对象或 [DataView](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView) 来读取和写入缓冲区内容。
 
-A [SharedArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) is very similar to an array buffer except it is built in a way that they can be used to create views on shared memory.
+[SharedArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) 与数组缓冲区非常相似，不同之处在于它们可以用于在共享内存上创建视图。
 
 > [!WARNING]
-> You should learn how to use SharedArrayBuffers outside of the alt:V context in order to use them properly. The following example is making use of the [Atomics](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics) API to make the SharedArrayBuffer usage [thread safe](https://en.wikipedia.org/wiki/Thread_safety)
+> 为了正确使用SharedArrayBuffers，你应该学习如何在alt:V环境之外使用它们。以下示例利用[Atomics](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics) API来确保SharedArrayBuffer的[线程安全](https://en.wikipedia.org/wiki/Thread_safety)。
 
-**Example usage**
+**示例用例**
 
 # [client](#tab/tab4-0)
 ```js
@@ -157,20 +154,20 @@ const sharedArray = new Int32Array(buffer);
 
 worker.on('changedValue', () => {
      for(let i = 0; i < 10; i++){
-       // Output of the changed values on "main thread"
+       // 在"主线程"上输出更改后的值
        const value = Atomics.load(sharedArray,i);
        console.log(`[Main thread]: Value of index ${i} is ${value}`);
     }
 });
 
 function createBuffer() {
-    // Calculating the size of the buffer size depending on the array type
+    // 根据数组类型计算缓冲区大小
     const length = 10;
     const size = Int32Array.BYTES_PER_ELEMENT * length;
     const sharedBuffer = new SharedArrayBuffer(size);
     const sharedArray = new Int32Array(sharedBuffer);
       
-    // applying values to the array
+    // 向数组应用值
     for(let i = 0; i< 10; i++){
         sharedArray[i] = i*20;
     }
@@ -185,20 +182,20 @@ function createBuffer() {
 # [worker](#tab/tab4-1)
 ```js
 alt.on('addedMyBuffer', (index) => {
-    //Getting the buffer by index and generate a Int32Array 
+    //通过索引获取缓冲区并生成一个Int32Array
     const buffer = alt.getSharedArrayBuffer(index);
     const sharedArray = new Int32Array(buffer);
 
     for(let i = 0; i < 10; i++) {
-        //Read the value
+        //读取值
         const arrayValue = Atomics.load(sharedArray, i);
         console.log(`[Worker] Value from main thread for [${i}] is ${arrayValue}`);
 
-        // Atomics.exchange returns the old value on i.
+        // Atomics.exchange 返回索引 i 上的旧值。
         const oldValue = Atomics.exchange(sharedArray, i, 5)
         console.log(`[Worker] Value change to 5 on [${i}]`);
 
-        // reading the new value
+        // 读取新值
         const changedValue = Atomics.load(sharedArray, i);
         console.log(`[Worker] New value on ${i} is ${changedValue} (old value: ${oldValue})`);
 

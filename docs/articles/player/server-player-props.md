@@ -1,12 +1,12 @@
-# Player Properties
+# 玩家属性
 
-This page will act as a representation on using the various player properties.
+此页面将作为使用各种玩家属性的表示。
 
-These are meant to be used on server side.
+这些应该在服务器端使用。
 
 ## player.armour
 
-Used to **set or get** the player's current armour level.
+用于**设置或获取**玩家当前的盔甲等级。
 
 ```js
 const currentArmour = player.armour;
@@ -17,7 +17,7 @@ player.armour -= 10;
 
 ## player.authToken
 
-Used to **get** an authToken provided during early auth implementations. Most users will not be utilizing this.
+用于在早期的认证实现中**获取**一个authToken。大多数用户不会使用它。
 
 ```js
 alt.on('playerConnect', handleConnect);
@@ -34,7 +34,7 @@ function handleConnect(player) {
 
 ## player.currentWeapon
 
-Used to **set or get** the player's current weapon hash.
+用于**设置或获取**玩家当前武器的哈希值。
 
 ```js
 player.currentWeapon = alt.hash('weapon_pistol'); // 0x1B06D571
@@ -44,7 +44,7 @@ if (player.currentWeapon === 0x1b06d571) {
 }
 ```
 
-If you want to handle all weapon checking server-side in plain English rather than hashes. You should try using a prototype to set and give a player a weapon.
+如果你想在服务器端用简单的英语而不是散列来处理所有武器检查。你应该尝试使用原型去设置并提供给玩家武器。
 
 ```js
 alt.Player.prototype.setWeapon = function(weaponName) {
@@ -55,7 +55,7 @@ alt.Player.prototype.setWeapon = function(weaponName) {
 
 ## player.currentWeaponComponents
 
-Used to **get** all weapon components that are currently on a player's currently equipped weapon. All weapon components are hashed.
+用于**获取**玩家当前装备的武器上的所有武器组件。所有武器组件都被哈希。
 
 ```js
 const currentWeaponComponents = player.currentWeaponComponents;
@@ -67,7 +67,7 @@ for (let i = 0; i < currentWeaponComponents.length; i++) {
 
 ## player.currentWeaponTintIndex
 
-Used to **get** the currently equipped weapon's tint index.
+用于**获取**当前装备武器的着色指数。
 
 ```js
 const currentTint = player.currentWeaponTintIndex;
@@ -75,50 +75,50 @@ const currentTint = player.currentWeaponTintIndex;
 
 ## player.dimension
 
-Used to **get** or **set** the player's current dimension. Dimensions are based on INT32. Which means there is a minimum and maximum value for a dimension. From `-2147483648` to `2147483648`.
+用于**获取**或**设置**玩家的当前尺寸。尺寸基于INT32。这意味着一个维度有一个最小值和最大值。从`-2147483648`到`2147483648`。
 
-A description for dimensions written by Heron is as follows.
+Heron对dimensions的描述如下。
 
 ```
-X can see only X
--X can see 0 and -X
-0 can't see -X and X
+X只能看到X
+-X可以看到0和-X
+0看不到-X和X
 ```
 
-The default dimension is **0**.
+默认维度是**0**。
 
 ```js
 const currentDimension = player.dimension;
 player.dimension = 1;
 
-// If you need a unique instance per player join. This is a decent way to handle it.
-// Just remember to set it back to zero after you do whatever you need to do in a unique dimension.
+// 如果你需要每个玩家加入一个唯一的实例。这是一种不错的处理方式。
+// 只要记得在对唯一维度执行任何操作后将其设置为零即可。
 player.dimension = player.id;
 ```
 
 ## player.entityAimOffset
 
-Used to **get** the player's current aim offset. There is currently not existing use case for this specific function.
+用于**获取**玩家当前的瞄准偏移量。目前还没有这个特定功能的用例。
 
-At the time of writing this document we're not even sure if it's functioning.
+在撰写本文时，我们甚至不确定它是否正常运行。
 
 ## player.entityAimingAt
 
-Used to **get** the player's current entity they are aiming at. The current sentiment is that this specific property does not work.
+用来**获取**玩家当前的目标实体。目前的看法是，这个特定的属性不起作用。
 
-At the time of writing this document we're not even sure if it's functioning.
+在撰写本文时，我们甚至不确定它是否正常运行。
 
 ## player.flashlightActive
 
-Used to **get** the player's flashlight activity?
+用于**获取**玩家的手电筒活动?
 
-At the time of writing this document we're not even sure if it's functioning.
+在撰写本文时，我们甚至不确定它是否正常运行。
 
 ## player.health
 
-Used to **get or set** the player's current health.
+用于**获取或设置**玩家当前的生命值。
 
-Each model in GTA:V has its own health range.
+《GTA:V》中的每个模型都有自己的健康范围。
 
 ```js
 const currentHealth = player.health;
@@ -130,11 +130,11 @@ player.health = 0;
 
 ## player.hwidExHash
 
-This is one of two ways to get a unique hardware hash that belongs to the player.
+这是获得属于玩家的唯一硬件哈希的两种方法之一。
 
-This is a great way to ban a player; especially when they'll need a whole new set of hardware to get past your ban.
+这是一个禁止玩家的好方法;尤其是他们需要一套全新的硬件才能通过你的禁令。
 
-Nobody currently knows the way this hardware information is determined.
+目前没有人知道如何确定硬件信息。
 
 ```js
 const currentHwidEx = player.hwidExHash;
@@ -142,11 +142,12 @@ const currentHwidEx = player.hwidExHash;
 
 ## player.hwidHash
 
-This is one of two ways to get a unique hardware hash that belongs to the player.
+这是获得属于玩家的唯一硬件哈希的两种方法之一。
 
-This is a great way to ban a player; especially when they'll need a whole new set of hardware to get past your ban.
+这是一个禁止玩家的好方法;尤其是他们需要一套全新的硬件才能通过你的禁令。
 
-Nobody currently knows the way this hardware information is determined.
+目前没有人知道如何确定硬件信息。
+
 
 ```js
 const currentHwid = player.hwidHash;
@@ -154,9 +155,9 @@ const currentHwid = player.hwidHash;
 
 ## player.id
 
-Used to **get** the player's current id. These are strictly unique to the join order of a player. If a player disconnects its id will be reused by the new player who connects or vehicle which will be created later.
+用于**获取**玩家的当前id。这些严格来说对于玩家的加入顺序是唯一的。如果玩家断开连接，它的id将被连接的新玩家或稍后创建的车辆重复使用。
 
-ID's may be used up to the value `65535`.
+ID的值可以使用到`65535`。
 
 ```js
 alt.on('playerConnect', handleConnect);
@@ -168,9 +169,9 @@ function handleConnect(player) {
 
 ## player.ip
 
-In most cases this is an IP that is converted from IPv4 to IPv6.
+在大多数情况下，这是一个从IPv4转换到IPv6的IP。
 
-An example of what a local host IP looks like: `::ffff:127.0.0.1`
+本地主机IP的一个示例:`::ffff:127.0.0.1`
 
 ```js
 alt.on('playerConnect', handleConnect);
@@ -184,9 +185,9 @@ function handleConnect(player) {
 
 ## player.maxArmour
 
-Used to **set or get** the player's current maximum armour. The maximum value this can be set to is `8191`.
+用于**设置或获取**玩家当前的最大护甲。最大值可以设置为`8191`。
 
-After setting this you can set the player's current armour to the maximum armour value.
+设置完成后，可以将玩家的当前盔甲设置为最大盔甲值。
 
 ```js
 const currentMaxArmour = player.maxArmour;
@@ -200,9 +201,9 @@ alt.log(`${player.name} is a chunker.`);
 
 ## player.maxHealth
 
-Used to **set or get** the player's current maximum health. The maximum value this can be set to is `8191`.
+用于**设置或获取**玩家当前的最大生命值。最大值可以设置为`8191`。
 
-After setting this you can set the player's current health to the maximum health value.
+在此之后，你可以将玩家的当前生命值设置为最大生命值。
 
 ```js
 const currentMaxHealth = player.maxHealth;
@@ -216,11 +217,11 @@ alt.log(`${player.name} is a healthy chunker.`);
 
 ## player.model
 
-Used to set **set or get** the player's current model.
+用于设置**设置或获取**玩家的当前模型。
 
-You may pass a string value here.
+你可以在这里传递一个字符串值。
 
-No model is set automatically and should be set when the player is connected or authenticated.
+没有自动设置模型，应该在玩家连接或认证时设置。
 
 ```js
 alt.on('playerConnect', handleConnect);
@@ -232,7 +233,7 @@ function handleConnect(player) {
 
 ## player.name
 
-Used to **get** the player's current name. This is set by the player in their options.
+用于**获取**玩家的当前名字。这是由玩家在他们的选项中设定的。
 
 ```js
 alt.on('playerConnect', handleConnect);
@@ -246,9 +247,9 @@ function handleConnect(player) {
 
 ## player.netOwner
 
-Used to **get** the current network owner responsible for syncing an entity with the server. Inherited from entity.
+用于**获取**负责将实体同步到服务器的当前网络所有者。继承自entity。
 
-This is not necessarily a useful property for the average developer.
+对于一般的开发人员来说，这并不是一个有用的属性。
 
 ```js
 const currentOwner = player.netOwner;
@@ -260,9 +261,9 @@ if (!currentOwner) {
 
 ## player.ping
 
-Used to **get** the player's current ping.
+用于**获取**玩家当前的ping。
 
-Below is a snippet to make player ping accessible by all players.
+下面是一个片段，使玩家ping可由所有玩家查看。
 
 ```js
 alt.setInterval(handlePingUpdate, 5000);
@@ -283,9 +284,9 @@ function handlePingUpdate() {
 
 ## player.pos
 
-Used to **get** or **set** the player's current position.
+用于**获取**或**设置**玩家的当前位置。
 
-When getting the player's current position you should use a spread operator to make it modifiable.
+当获得玩家的当前位置时，你应该使用扩展操作符使其可修改。
 
 ```js
 const currentPos = { ...player.pos };
@@ -316,31 +317,31 @@ player.rot = new alt.Vector3(0, 0, 0);
 
 ## player.seat
 
-Used to **get** the current seat that the player is in.
+用于**获得**玩家当前所在的位置。
 
 ```js
 if (player.vehicle && player.seat === 1) {
-    alt.log(`Player is in the driver's seat.`); // Front Left
+    alt.log(`Player is in the driver's seat.`); // 驾驶位
 }
 
 if (player.vehicle && player.seat === 2) {
-    alt.log(`Player is riding shotgun.`); // Passenger. Right side.
+    alt.log(`Player is riding shotgun.`); // 副驾驶
 }
 
 if (player.vehicle && player.seat === 3) {
-    alt.log(`Player is behind the driver's seat.`); // Back Left
+    alt.log(`Player is behind the driver's seat.`); // 左后方
 }
 
 if (player.vehicle && player.seat === 4) {
-    alt.log(`Player is behind the player riding shotgun.`); // Back Right
+    alt.log(`Player is behind the player riding shotgun.`); // 右后方
 }
 ```
 
 ## player.socialID
 
-Used to **get** a non-safe version of a player's current social club identification that is linked to their Rockstar account.
+用于**获取**玩家当前social club身份的非安全版本，该身份与他们的Rockstar账户相关联。
 
-Keep in mind that this value **IS NOT SAFE** do not use it for authentication. **IT CAN BE SPOOFED**.
+请记住，这个值**不安全**，不要将其用于身份验证。**它可以被伪造**。
 
 ```js
 const social = player.socialID;
@@ -348,9 +349,9 @@ const social = player.socialID;
 
 ## player.valid
 
-Used to **get** if a player entity is still valid. This is useful when using timeouts, intervals, and handling disconnect events.
+用于**获取**玩家实体是否仍然有效。在使用超时、间隔和处理断开连接事件时，这很有用。
 
-A player that invalid means that it disconnected from the server.
+无效的玩家意味着它与服务器断开了连接。
 
 ```js
 alt.on('playerDisconnect', handleDisconnect);
@@ -367,7 +368,7 @@ function handleDisconnect(player, reason) {
 
 ## player.vehicle
 
-Used to **get** the current vehicle that the player is inside. Returns **null** if the player is **NOT** in a vehicle.
+用于**获取**玩家所在的当前车辆。如果玩家**不在**车辆中，则返回**null**。
 
 ```js
 const { vehicle } = player

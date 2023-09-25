@@ -1,6 +1,6 @@
-# Drawing Text 3D & 2D
+# 绘制3D和2D文本
 
-Used to draw text on your screen or in a 3D space. This only works on **client-side**.
+用于在屏幕或3D空间中绘制文本。这只适用于**客户端**。
 
 **Client Side**
 
@@ -95,7 +95,7 @@ export function drawText3d(
 }
 ```
 
-## Example Usage
+## 示例用法
 
 **Client Side**
 

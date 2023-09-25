@@ -78,15 +78,15 @@ declare module "alt-client" {
     DisablePedPropKnockOff = "DISABLE_PED_PROP_KNOCK_OFF",
     DisableIdleCamera = "DISABLE_IDLE_CAMERA",
     DisableVehicleEngineShutdownOnLeave = "DISABLE_VEHICLE_ENGINE_SHUTDOWN_ON_LEAVE",
-    /** @alpha */
+    /** @beta */
     DisableSPEnterVehicleClipset = "DISABLE_SP_ENTER_VEHICLE_CLIPSET",
-    /** @alpha */
+    /** @beta */
     ForceRenderSnow = "FORCE_RENDER_SNOW",
-    /** @alpha */
-    ForceHideNightProps  = "FORCE_HIDE_NIGHT_PROPS",
-    /** @alpha */
-    ForceShowNightProps  = "FORCE_SHOW_NIGHT_PROPS",
-    /** @alpha */
+    /** @beta */
+    ForceHideNightProps = "FORCE_HIDE_NIGHT_PROPS",
+    /** @beta */
+    ForceShowNightProps = "FORCE_SHOW_NIGHT_PROPS",
+    /** @beta */
     DisableEmissiveLightsRendering = "DISABLE_EMISSIVE_LIGHTS_RENDERING",
   }
 
@@ -136,23 +136,23 @@ declare module "alt-client" {
      */
     leftVehicle: (vehicle: Vehicle, seat: number) => void;
     /**
-     * @alpha
+     * @beta
      *
      * @remarks The seat indexes start with 1 (driver seat).
      */
-    startEnteringVehicle: (vehicle: Vehicle, seat: number) => boolean | void;
+    startEnteringVehicle: (vehicle: Vehicle, seat: number, player: Player) => boolean | void;
     /**
-     * @alpha
+     * @beta
      *
      * @remarks The seat indexes start with 1 (driver seat).
      */
-    startLeavingVehicle: (vehicle: Vehicle, seat: number) => boolean | void;
+    startLeavingVehicle: (vehicle: Vehicle, seat: number, player: Player) => boolean | void;
     removeEntity: (object: Entity) => void;
     resourceStart: (errored: boolean) => void;
     resourceStop: () => void;
     resourceError: (error: Error, file: string, line: number, stackTrace: string) => void;
     syncedMetaChange: (entity: Entity, key: string, value: any, oldValue: any) => void;
-    streamSyncedMetaChange: (entity: Entity, key: string, value: any, oldValue: any) => void;
+    streamSyncedMetaChange: (object: BaseObject, key: string, value: any, oldValue: any) => void;
     globalMetaChange: (key: string, value: any, oldValue: any) => void;
     globalSyncedMetaChange: (key: string, value: any, oldValue: any) => void;
     /**
@@ -177,41 +177,53 @@ declare module "alt-client" {
 
     playerWeaponChange: (oldWeapon: number, newWeapon: number) => void;
 
-    /** @alpha */
+    /** @beta */
     baseObjectCreate: (baseObject: BaseObject) => void;
 
-    /** @alpha */
+    /** @beta */
     baseObjectRemove: (baseObject: BaseObject) => void;
 
     weaponDamage: (target: Entity, weaponHash: number, damage: number, offset: shared.Vector3, bodyPart: shared.BodyPart, sourceEntity: Entity) => number | boolean | void;
 
     /**
      * Triggers when an Virtual Entity position is changed
-     * @alpha
+     * @beta
      */
     worldObjectPositionChange: (object: WorldObject, oldPosition: shared.Vector3) => void;
 
     /**
-     * @alpha
+     * @beta
      */
     worldObjectStreamIn: (object: WorldObject) => void;
 
     /**
-     * @alpha
+     * @beta
      */
     worldObjectStreamOut: (object: WorldObject) => void;
 
-    /** @alpha */
+    /** @beta */
     metaChange: (target: BaseObject, key: string, value: any, oldValue: any) => void;
 
-    /** @alpha */
+    /** @beta */
     entityEnterColshape: (colshape: Colshape, entity: Entity) => void;
 
-    /** @alpha */
+    /** @beta */
     entityLeaveColshape: (colshape: Colshape, entity: Entity) => void;
 
-    /** @alpha */
+    /** @beta */
     entityHitEntity: (damager: Entity, target: Entity, weaponHash: number) => void;
+
+    /** @beta */
+    playerBulletHit: (weaponHash: number, victim: Entity, position: shared.Vector3) => void;
+
+    /** @beta */
+    voiceConnection: (state: shared.VoiceConnectionState) => void;
+
+    /** @alpha */
+    playerStartTalking: (target: Player) => void;
+
+    /** @alpha */
+    playerStopTalking: (target: Player) => void;
   }
 
   export interface IDiscordUser {
@@ -348,7 +360,7 @@ declare module "alt-client" {
     /**
      * The list of profile nodes. First item is the root node.
      */
-    readonly nodes: IProfileNode[];
+    readonly nodes: readonly IProfileNode[];
 
     /**
      * Profiling start timestamp in microseconds.
@@ -363,12 +375,12 @@ declare module "alt-client" {
     /**
      * Ids of samples top nodes.
      */
-    readonly samples: number[];
+    readonly samples: readonly number[];
 
     /**
      * Time intervals between adjacent samples in microseconds. The first delta is relative to the profile startTime.
      */
-    readonly timeDeltas: number[];
+    readonly timeDeltas: readonly number[];
   }
 
   export interface IProfileCallFrame {
@@ -417,7 +429,7 @@ declare module "alt-client" {
     /**
      * Child node ids.
      */
-    readonly children?: ReadonlyArray<number>;
+    readonly children?: readonly number[];
 
     /**
      * The reason of being not optimized. The function may be deoptimized or marked as don't optimize.
@@ -427,7 +439,7 @@ declare module "alt-client" {
     /**
      * An array of source position ticks.
      */
-    readonly positionTicks: ReadonlyArray<IProfileTickInfo>;
+    readonly positionTicks: readonly IProfileTickInfo[];
   }
 
   export interface IProfileTickInfo {
@@ -512,6 +524,30 @@ declare module "alt-client" {
    */
   export interface ICustomVehicleMeta extends ICustomEntityMeta {}
 
+  /**
+   * Extend it by merging interfaces for use in vehicle meta {@link "alt-client".Ped getMeta method}, {@link "alt-client".Ped setMeta method}, etc.
+   *
+   * @remarks See {@link "alt-shared".ICustomGlobalMeta} for an example of use.
+   */
+  export interface ICustomPedMeta extends ICustomEntityMeta {}
+
+  /**
+   * Extend `alt.emit` auto-completion by merging interfaces for use with `alt.emit`.
+   *
+   * @example
+   * ```ts
+   * declare module 'alt-client' {
+   *    interface ICustomEmitEvent {
+   *        myEvent: (arg1: string, arg2: { key: string, value: number })
+   *    }
+   * }
+   * ```
+   *
+   * @export
+   * @interface ICustomEmitEvent
+   */
+  export interface ICustomEmitEvent {}
+
   export interface IMarkerOptions {
     type?: number;
     dir?: shared.IVector3;
@@ -536,20 +572,23 @@ declare module "alt-client" {
     /**
      * Whether this entity was created clientside or serverside. (Clientside = false, Serverside = true).
      *
-     * @alpha
+     * @beta
      */
     public readonly isRemote: boolean;
     /**
      * The serverside id of this entity.
-     * @alpha
+     * @beta
      * */
-    public readonly remoteId: number;
+    public readonly remoteID: number;
 
     /**
      * Gets the base object with the given type and local id
-     * @alpha
+     * @beta
      */
-    public getByID(type: shared.BaseObjectType, id: number): BaseObject;
+    public static getByID(type: shared.BaseObjectType, id: number): BaseObject | null;
+
+    /** @beta */
+    public static getByRemoteID(type: shared.BaseObjectType, id: number): BaseObject | null;
 
     public deleteMeta(key: string): void;
     public deleteMeta<K extends shared.ExtractStringKeys<ICustomBaseObjectMeta>>(key: K): void;
@@ -568,27 +607,27 @@ declare module "alt-client" {
     public setMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<ICustomBaseObjectMeta, K, V>): void;
   }
 
-  /** @alpha */
+  /** @beta */
   export class VirtualEntityGroup extends BaseObject {
     /** Creates a new Virtual Entity Group */
     public constructor(maxEntitiesInStream: number);
 
     /** Returns all Virtual Entity Group instances */
-    public static readonly all: ReadonlyArray<VirtualEntityGroup>;
+    public static readonly all: readonly VirtualEntityGroup[];
 
     /** Maximum streaming range of the Virtual Entity Group */
     public readonly maxEntitiesInStream: number;
   }
 
-  /** @alpha */
+  /** @beta */
   export class VirtualEntity extends WorldObject {
     /** Creates a new Virtual Entity */
     public constructor(group: VirtualEntityGroup, position: shared.Vector3, streamingDistance: number, data?: Record<string, any>);
 
     /** Returns all Virtual Entity instances */
-    public static readonly all: ReadonlyArray<VirtualEntity>;
+    public static readonly all: readonly VirtualEntity[];
 
-    public static readonly streamedIn: ReadonlyArray<VirtualEntity>;
+    public static readonly streamedIn: readonly VirtualEntity[];
 
     /** Virtual Entity Group this entity belongs to */
     public readonly group: VirtualEntityGroup;
@@ -623,7 +662,7 @@ declare module "alt-client" {
      * Returns all set meta keys of the Virtual Entity.
      * Only available for server-side created Virtual Entities.
      */
-    public getStreamSyncedMetaKeys(): ReadonlyArray<string>;
+    public getStreamSyncedMetaKeys(): readonly string[];
   }
 
   /** @beta */
@@ -633,26 +672,26 @@ declare module "alt-client" {
      *
      * @param source The source url of the audio.
      * @param volume The volume of the audio. Ranges from 0 to 1.
-     * @param category The category of the audio. Defaults to 'radio'.
-     * @param play2D If the sound will be played in 2D, if false it will be 3D.
      */
-    public constructor(source: string, volume: number, category?: shared.AudioCategory | `${shared.AudioCategory}`, play2D?: boolean);
+    public constructor(source: string, volume?: number, radio?: boolean);
 
-    /** @alpha */
-    public static readonly all: ReadonlyArray<Audio>;
+    public static readonly all: readonly Audio[];
 
-    /** @alpha */
-    public readonly count: number;
+    public static readonly count: number;
+
+    /**
+     * Retrieves the audio from the pool.
+     *
+     * @param id The id of the audio.
+     * @returns Entity if it was found, otherwise null.
+     */
+    public static getByID(id: number): Audio | null;
 
     public source: string;
 
     public looped: boolean;
 
     public volume: number;
-
-    public category: shared.AudioCategory | `${shared.AudioCategory}`;
-
-    public readonly frontendPlay: boolean;
 
     public readonly currentTime: number;
 
@@ -663,17 +702,17 @@ declare module "alt-client" {
     /**
      * @remarks This method has no effect if the {@link frontendPlay} property returns true.
      */
-    public addOutput(entity: Entity | number): void;
+    public addOutput(output: AudioOutput): void;
 
     /**
      * @remarks This method has no effect if the {@link frontendPlay} property returns true.
      */
-    public removeOutput(entity: Entity | number): void;
+    public removeOutput(output: AudioOutput): void;
 
     /**
      * @remarks This method has no effect if the {@link frontendPlay} property returns true.
      */
-    public getOutputs(): ReadonlyArray<Entity | number>;
+    public getOutputs(): readonly (AudioOutput | number)[];
 
     public play(): void;
     public pause(): void;
@@ -681,7 +720,13 @@ declare module "alt-client" {
 
     public seek(time: number): void;
 
+    public on(event: "inited", callback: () => void): void;
+    public on(event: "streamStarted", callback: () => void): void;
     public on(event: "streamEnded", callback: () => void): void;
+    public on(event: "streamPaused", callback: () => void): void;
+    public on(event: "streamReset", callback: () => void): void;
+    public on(event: "streamSeek ", callback: (time: number) => void): void;
+    public on(event: "volumeChange ", callback: (vol: number) => void): void;
     public on(event: "error", callback: (code: number, message: string) => void): void;
 
     public deleteMeta(key: string): void;
@@ -701,6 +746,50 @@ declare module "alt-client" {
     public setMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<ICustomAudioMeta, K, V>): void;
   }
 
+  /** @beta */
+  export class AudioOutput extends BaseObject {
+    protected constructor();
+
+    public static readonly all: readonly AudioOutput[];
+
+    public static readonly count: number;
+
+    /**
+     * Retrieves the audiooutput from the pool.
+     *
+     * @param id The id of the audiooutput.
+     * @returns Entity if it was found, otherwise null.
+     */
+    public static getByID(id: number): AudioOutput | null;
+
+    public muted: boolean;
+
+    public volume: number;
+
+    public category: number;
+
+    public filter: AudioFilter | null;
+  }
+
+  /** @beta */
+  export class AudioOutputFrontend extends AudioOutput {
+    public constructor(categoryHash?: number);
+  }
+
+  /** @beta */
+  export class AudioOutputWorld extends AudioOutput {
+    public constructor(pos: shared.IVector3, categoryHash?: number);
+
+    public pos: shared.Vector3;
+  }
+
+  /** @beta */
+  export class AudioOutputAttached extends AudioOutput {
+    public constructor(entity: WorldObject, categoryHash?: number);
+
+    public entity: WorldObject;
+  }
+
   export class WorldObject extends BaseObject {
     /**
      * Object position
@@ -712,7 +801,7 @@ declare module "alt-client" {
      *
      * @remarks Check https://docs.altv.mp/articles/dimensions.html to understand how it works.
      *
-     * @alpha
+     * @beta
      */
     public dimension: number;
   }
@@ -723,26 +812,28 @@ declare module "alt-client" {
     public radius: number;
     public height: number;
     public color: shared.RGBA;
+    /** @beta */
+    public iconColor: shared.RGBA;
 
-    constructor(type: shared.CheckpointType, pos: shared.IVector3, nextPos: shared.IVector3, radius: number, height: number, rgbcolor: shared.RGBA, streamingDistance: number);
+    constructor(type: shared.CheckpointType, pos: shared.IVector3, nextPos: shared.IVector3, radius: number, height: number, rgbcolor: shared.RGBA, iconColor: shared.RGBA, streamingDistance: number);
 
     /**
      * Streaming range for the checkpoint
      *
-     * @alpha
+     * @beta
      */
     public readonly streamingDistance: number;
 
-    /** @alpha */
-    public static readonly all: ReadonlyArray<Checkpoint>;
+    /** @beta */
+    public static readonly all: readonly Checkpoint[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
 
-    /** @alpha */
+    /** @beta */
     public readonly isStreamedIn: boolean;
 
-    /** @alpha */
+    /** @beta */
     public visible: boolean;
 
     /**
@@ -751,16 +842,16 @@ declare module "alt-client" {
      * @param id The id of the checkpoint.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): Checkpoint | null;
 
     /**
-     * @alpha
+     * @beta
      */
     public static getByScriptID(scriptID: number): Checkpoint | null;
 
-    /** @alpha */
+    /** @beta */
     public readonly scriptID: number;
 
     public isEntityIn(entity: Entity): boolean;
@@ -798,7 +889,7 @@ declare module "alt-client" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Entity>;
+    public static readonly all: readonly Entity[];
 
     /** Internal game id that can be used in native calls */
     public readonly scriptID: number;
@@ -837,14 +928,6 @@ declare module "alt-client" {
     public rot: shared.Vector3;
 
     public readonly visible: boolean;
-
-    /**
-     * Retrieves the entity from the pool.
-     *
-     * @param id The id of the entity.
-     * @returns Entity if it was found, otherwise null.
-     */
-    public static getByID(id: number): Entity | null;
 
     /**
      * Retrieves the entity from the pool.
@@ -890,7 +973,7 @@ declare module "alt-client" {
     public hasSyncedMeta(key: string): boolean;
     public hasSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntitySyncedMeta>>(key: K): boolean;
 
-    public getSyncedMetaKeys(): ReadonlyArray<string>;
+    public getSyncedMetaKeys(): readonly string[];
 
     /**
      * Gets a value using the specified key.
@@ -912,7 +995,7 @@ declare module "alt-client" {
     public hasStreamSyncedMeta(key: string): boolean;
     public hasStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntityStreamSyncedMeta>>(key: K): boolean;
 
-    public getStreamSyncedMetaKeys(): ReadonlyArray<string>;
+    public getStreamSyncedMetaKeys(): readonly string[];
 
     public frozen: boolean;
   }
@@ -932,15 +1015,15 @@ declare module "alt-client" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Player>;
+    public static readonly all: readonly Player[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
 
     /**
      * Array with all streamed in players.
      */
-    public static readonly streamedIn: ReadonlyArray<Player>;
+    public static readonly streamedIn: readonly Player[];
 
     /**
      * The local player instance.
@@ -964,14 +1047,20 @@ declare module "alt-client" {
     /**
      * Current weapon components.
      */
-    public readonly currentWeaponComponents: ReadonlyArray<number>;
+    public readonly currentWeaponComponents: readonly number[];
+
+    /** @beta */
+    public hasWeaponComponent(weaponModel: string | number, component: string | number): boolean;
 
     /**
      * Tint index for currently equipped weapon.
      *
-     * @alpha
+     * @beta
      */
-    //public readonly currentWeaponTintIndex: number;
+    public readonly currentWeaponTintIndex: number;
+
+    /** @beta */
+    public getWeaponTintIndex(weaponModel: string | number): number;
 
     /**
      * Currently equipped weapon.
@@ -1010,20 +1099,23 @@ declare module "alt-client" {
      */
     public readonly isReloading: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isEnteringVehicle: boolean;
 
-    /** @alpha */
+    //** @beta */
     public readonly isLeavingVehicle: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isOnLadder: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isInMelee: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isInCover: boolean;
+
+    /** @beta */
+    public readonly isParachuting: boolean;
 
     /**
      * Current armour.
@@ -1102,7 +1194,7 @@ declare module "alt-client" {
 
     /**
      * Gets the player with the given remote id
-     * @alpha
+     * @beta
      */
     public static getByRemoteID(id: number): Player | null;
 
@@ -1130,16 +1222,16 @@ declare module "alt-client" {
     /**
      * Is the player currently crouching.
      *
-     * @alpha
+     * @beta
      */
-    //public readonly isCrouching: boolean;
+    public readonly isCrouching: boolean;
 
     /**
      * Is the player currently stealthy.
      *
-     * @alpha
+     * @beta
      */
-    //public readonly isStealthy: boolean;
+    public readonly isStealthy: boolean;
 
     /**
      * Forward speed of the player.
@@ -1150,6 +1242,12 @@ declare module "alt-client" {
      * Strafe speed of the player.
      */
     public readonly strafeSpeed: number;
+
+    /** @beta */
+    public filter: AudioFilter | null;
+
+    /** @alpha */
+    public readonly taskData: string;
 
     // normal meta
 
@@ -1192,14 +1290,14 @@ declare module "alt-client" {
 
   export class LocalPlayer extends Player {
     /**
-     * @alpha
+     * @beta
      */
     public readonly dimension: number;
 
-    /** @alpha */
+    /** @beta */
     public pos: shared.Vector3;
 
-    /** @alpha */
+    /** @beta */
     public rot: shared.Vector3;
 
     /**
@@ -1209,7 +1307,7 @@ declare module "alt-client" {
      */
     public readonly currentAmmo: number;
 
-    public readonly weapons: ReadonlyArray<number>;
+    public readonly weapons: readonly shared.IWeapon[];
 
     public readonly currentWeaponData: WeaponData | null;
 
@@ -1217,9 +1315,9 @@ declare module "alt-client" {
 
     public getWeaponAmmo(weaponName: string): number;
 
-    public getWeaponComponents(hash: number): ReadonlyArray<number>;
+    public getWeaponComponents(hash: number): readonly number[];
 
-    public getWeaponComponents(weaponName: string): ReadonlyArray<number>;
+    public getWeaponComponents(weaponName: string): readonly number[];
 
     public hasWeapon(hash: number): boolean;
 
@@ -1261,15 +1359,15 @@ declare module "alt-client" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Vehicle>;
+    public static readonly all: readonly Vehicle[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
 
     /**
      * Array with all streamed in vehicles.
      */
-    public static readonly streamedIn: ReadonlyArray<Vehicle>;
+    public static readonly streamedIn: readonly Vehicle[];
 
     /**
      * Vehicle gear.
@@ -1817,7 +1915,7 @@ declare module "alt-client" {
 
     /**
      * Gets the vehicle with the given remote id
-     * @alpha
+     * @beta
      */
     public static getByRemoteID(id: number): Vehicle | null;
   }
@@ -1829,7 +1927,7 @@ declare module "alt-client" {
      * @param id The id of the webview.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): WebView | null;
 
@@ -1838,11 +1936,14 @@ declare module "alt-client" {
     /** View URL */
     public url: string;
 
-    /** @alpha */
-    public static readonly all: ReadonlyArray<WebView>;
+    /** @beta */
+    public static readonly all: readonly WebView[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
+
+    /** @beta */
+    public static readonly gpuAccelerationActive: boolean;
 
     /**
      * Is the webview a overlay.
@@ -1997,7 +2098,7 @@ declare module "alt-client" {
      * @param eventName Name of the event.
      * @returns Array of listener functions for that event.
      */
-    public getEventListeners(eventName: string | null): ((...args: any[]) => void)[];
+    public getEventListeners(eventName: string | null): readonly ((...args: any[]) => void)[];
 
     /**
      * Sets the specified header to the specified value.
@@ -2014,7 +2115,16 @@ declare module "alt-client" {
      */
     public setZoomLevel(value: number): void;
 
-    /** @alpha */
+    /** @beta */
+    public addOutput(output: AudioOutput): void;
+
+    /** @beta */
+    public removeOutput(output: AudioOutput): void;
+
+    /** @beta */
+    public getOutputs(): readonly (AudioOutput | number)[];
+
+    /** @beta */
     public reload(ignoreCache?: boolean): void;
 
     public deleteMeta(key: string): void;
@@ -2163,10 +2273,10 @@ declare module "alt-client" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Blip>;
+    public static readonly all: readonly Blip[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
 
     /**
      * Retrieves the blip from the pool.
@@ -2174,7 +2284,7 @@ declare module "alt-client" {
      * @param id The id of the blip.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): Blip | null;
 
@@ -2184,13 +2294,13 @@ declare module "alt-client" {
      * @param scriptID The script id of the blip.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByScriptID(scriptID: number): Blip | null;
 
     /**
      * Gets the blip with the given remote id
-     * @alpha
+     * @beta
      */
     public static getByRemoteID(id: number): Blip | null;
 
@@ -2206,7 +2316,7 @@ declare module "alt-client" {
 
     public category: number;
 
-    public color: shared.BlipColor;
+    public color: shared.BlipColor | number;
 
     public crewIndicatorVisible: boolean;
 
@@ -2258,8 +2368,35 @@ declare module "alt-client" {
 
     public tickVisible: boolean;
 
-    /** @alpha */
+    /** @beta */
     public visible: boolean;
+
+    /** @beta */
+    public blipType: shared.BlipType;
+
+    /** @beta */
+    public isFriendly: boolean;
+
+    /** @beta */
+    public isHiddenOnLegend: boolean;
+
+    /** @beta */
+    public isMinimalOnEdge: boolean;
+
+    /** @beta */
+    public useHeightIndicatorOnEdge: boolean;
+
+    /** @beta */
+    public isShortHeightThreshold: boolean;
+
+    /** @beta */
+    public readonly isStreamedIn: boolean;
+
+    /** @beta */
+    public readonly isAttached: boolean;
+
+    /** @beta */
+    public readonly isGlobal: boolean;
 
     public fade(opacity: number, duration: number): void;
 
@@ -2421,6 +2558,9 @@ declare module "alt-client" {
      */
     public static get(key: string): any;
 
+    /** @beta */
+    public static has(key: string): boolean;
+
     /**
      * Deletes the specified key from the local storage.
      */
@@ -2494,28 +2634,52 @@ declare module "alt-client" {
      */
     public static muteInput: boolean;
 
-    /** @alpha */
-    public activityInputEnabled: boolean;
+    /**
+     * @beta
+     *
+     * @remarks This property requires [Extended Voice API](https://docs.altv.mp/articles/permissions.html) permission from the user.
+     * */
+    public static activationLevel: number;
 
-    /** @alpha */
-    public activationLevel: number;
+    /**
+     * @beta
+     *
+     * @remarks This property requires [Extended Voice API](https://docs.altv.mp/articles/permissions.html) permission from the user.
+     */
+    public static noiseSuppressionEnabled: boolean;
 
-    /** @alpha */
-    public noiseSuppressionEnabled: boolean;
+    /**
+     * @beta
+     *
+     *  @remarks This property requires [Extended Voice API](https://docs.altv.mp/articles/permissions.html) permission from the user.
+     * */
+    public static inputDevice: string | null;
 
-    /** @alpha */
-    public inputDevice: string | null;
+    /**
+     * @beta
+     *
+     * @remarks This function requires [Extended Voice API](https://docs.altv.mp/articles/permissions.html) permission from the user.
+     */
+    public static toggleInput(enabled: boolean): void;
 
-    /** @alpha */
-    public toggleInput: boolean;
-
-    /** @alpha */
-    public getAvailableInputDevices: ReadonlyArray<IInputDevice>;
+    /**
+     * @beta
+     *
+     * @remarks This function requires [Extended Voice API](https://docs.altv.mp/articles/permissions.html) permission from the user.
+     * */
+    public static getAvailableInputDevices(): readonly IInputDevice[];
 
     /**
      * Determines if the voice activation is enabled.
      */
-    public static readonly activityInputEnabled: boolean;
+    public static get activityInputEnabled(): boolean;
+
+    /**
+     * Determines if the voice activation is enabled.
+     *
+     *  @remarks This setter requires [Extended Voice API](https://docs.altv.mp/articles/permissions.html) permission from the user.
+     */
+    public static set activityInputEnabled(enabled: boolean);
 
     /**
      * Returns the keycode of the voice activation key.
@@ -2543,11 +2707,13 @@ declare module "alt-client" {
   /**
    * Emits specified event across resources.
    *
-   * @param eventName Name of the event.
+   * @param
+   * eventName Name of the event.
    * @param args Rest parameters for emit to send.
    */
   // Do not allow to emit alt:V event name
-  export function emit<K extends string>(eventName: Exclude<K, keyof IClientEvent>, ...args: any[]): void;
+  export function emit<K extends keyof ICustomEmitEvent>(eventName: K, ...args: Parameters<ICustomEmitEvent[K]>): void;
+  export function emit<K extends string>(eventName: Exclude<K, keyof IClientEvent | keyof ICustomEmitEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event across resources.
@@ -2558,7 +2724,8 @@ declare module "alt-client" {
    * @remarks Works only from JS resource to JS resource
    */
   // Do not allow to emit alt:V event name
-  export function emitRaw<K extends string>(eventName: Exclude<K, keyof IClientEvent>, ...args: any[]): void;
+  export function emitRaw<K extends keyof ICustomEmitEvent>(eventName: K, ...args: Parameters<ICustomEmitEvent[K]>): void;
+  export function emitRaw<K extends string>(eventName: Exclude<K, keyof IClientEvent | keyof ICustomEmitEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to server.
@@ -2566,7 +2733,8 @@ declare module "alt-client" {
    * @param eventName Name of the event.
    * @param args Rest parameters for emit to send.
    */
-  export function emitServer(eventName: string, ...args: any[]): void;
+  export function emitServer<K extends keyof shared.ICustomClientServerEvent>(eventName: K, ...args: Parameters<shared.ICustomClientServerEvent[K]>): void;
+  export function emitServer<K extends string>(eventName: Exclude<K, keyof shared.ICustomClientServerEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to server.
@@ -2576,7 +2744,8 @@ declare module "alt-client" {
    *
    * @remarks Works only from JS (Client) to JS (Server)
    */
-  export function emitServerRaw(eventName: string, ...args: any[]): void;
+  export function emitServerRaw<K extends keyof shared.ICustomClientServerEvent>(eventName: K, ...args: Parameters<shared.ICustomClientServerEvent[K]>): void;
+  export function emitServerRaw<K extends string>(eventName: Exclude<K, keyof shared.ICustomClientServerEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to server.
@@ -2586,9 +2755,10 @@ declare module "alt-client" {
    *
    * @remarks Unreliable event should be used when you don't need to be sure that event will be received by server.
    *
-   * @alpha
+   * @beta
    */
-  export function emitServerUnreliable(eventName: string, ...args: any[]): void;
+  export function emitServerUnreliable<K extends keyof shared.ICustomClientServerEvent>(eventName: K, ...args: Parameters<shared.ICustomClientServerEvent[K]>): void;
+  export function emitServerUnreliable<K extends string>(eventName: Exclude<K, keyof shared.ICustomClientServerEvent>, ...args: any[]): void;
 
   /**
    * Returns whether the game controls are currently enabled.
@@ -2716,6 +2886,8 @@ declare module "alt-client" {
    * @param eventName Name of the event.
    * @param listener Listener that should be removed.
    */
+  export function offServer<K extends keyof shared.ICustomServerClientEvent>(eventName: K, listener: (...args: Parameters<shared.ICustomServerClientEvent[K]>) => void): void;
+  export function offServer<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, listener: (...args: any[]) => void): void;
   export function offServer(eventName: string, listener: (...args: any[]) => void): void;
 
   /**
@@ -2733,16 +2905,8 @@ declare module "alt-client" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function on<K extends keyof IClientEvent>(eventName: K, listener: IClientEvent[K]): void;
-
-  /**
-   * Subscribes to a custom client event with the specified listener.
-   *
-   * @param eventName Name of the event.
-   * @param listener Listener that should be added.
-   */
-  // Do not allow any function to subscribe to the alt:V event
-  export function on<K extends string>(eventName: K, listener: shared.InterfaceValueByKey<IClientEvent, K, (...args: any[]) => void, never>): void;
+  export function on<K extends keyof IClientEvent | keyof ICustomEmitEvent>(eventName: K, listener: (...args: shared.EventParameters<IClientEvent, ICustomEmitEvent, K>) => void): void;
+  export function on<K extends string>(eventName: Exclude<K, keyof IClientEvent | keyof ICustomEmitEvent>, listener: (...args: any[]) => void): void;
 
   /**
    * Subscribes to a client event with the specified listener, which only triggers once.
@@ -2750,25 +2914,8 @@ declare module "alt-client" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function once<K extends keyof IClientEvent>(eventName: K, listener: IClientEvent[K]): void;
-
-  /**
-   * Subscribes to a custom client event with the specified listener, which only triggers once.
-   *
-   * @param eventName Name of the event.
-   * @param listener Listener that should be added.
-   */
-  // Do not allow any function to subscribe to the alt:V event
-  export function once<K extends string>(eventName: K, listener: shared.InterfaceValueByKey<IClientEvent, K, (...args: any[]) => void, never>): void;
-
-  /**
-   * Subscribes to all events with the specified listener.
-   *
-   * @remarks Listener will be only called for user-created events.
-   *
-   * @param listener Listener that should be added.
-   */
-  export function on(listener: (eventName: string, ...args: any[]) => void): void;
+  export function once<K extends keyof IClientEvent | keyof ICustomEmitEvent>(eventName: K, listener: (...args: shared.EventParameters<IClientEvent, ICustomEmitEvent, K>) => void): void;
+  export function once<K extends string>(eventName: Exclude<K, keyof IClientEvent | keyof ICustomEmitEvent>, listener: (...args: any[]) => void): void;
 
   /**
    * Unsubscribes from a event with the specified listener.
@@ -2778,16 +2925,8 @@ declare module "alt-client" {
    * @param eventName Name of the event.
    * @param listener Listener that should be removed.
    */
-  export function off(eventName: string, listener: (...args: any[]) => void): void;
-
-  /**
-   * Unsubscribes from all user-created events with the specified listener.
-   *
-   * @remarks Listener should be of the same reference as when event was subscribed to.
-   *
-   * @param listener Listener that should be removed.
-   */
-  export function off(listener: (eventName: string, ...args: any[]) => void): void;
+  export function off<K extends keyof IClientEvent | keyof ICustomEmitEvent>(eventName: K, listener: (...args: shared.EventParameters<IClientEvent, ICustomEmitEvent, K>) => void): void;
+  export function off<K extends string>(eventName: Exclude<K, keyof IClientEvent | keyof ICustomEmitEvent>, listener: (...args: any[]) => void): void;
 
   /**
    * Subscribes to a server event with the specified listener.
@@ -2795,16 +2934,8 @@ declare module "alt-client" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function onServer(eventName: string, listener: (...args: any[]) => void): void;
-
-  /**
-   * Subscribes to all server events with the specified listener.
-   *
-   * @remarks Listener will be only called for user-created events.
-   *
-   * @param eventName Name of the event.
-   * @param listener Listener that should be added.
-   */
+  export function onServer<K extends keyof shared.ICustomServerClientEvent>(eventName: K, listener: (...args: Parameters<shared.ICustomServerClientEvent[K]>) => void): void;
+  export function onServer<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, listener: (...args: any[]) => void): void;
   export function onServer(listener: (eventName: string, ...args: any[]) => void): void;
 
   /**
@@ -2813,7 +2944,8 @@ declare module "alt-client" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function onceServer(eventName: string, listener: (...args: any[]) => void): void;
+  export function onceServer<K extends keyof shared.ICustomServerClientEvent>(eventName: K, listener: (...args: Parameters<shared.ICustomServerClientEvent[K]>) => void): void;
+  export function onceServer<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, listener: (...args: any[]) => void): void;
 
   /**
    * Subscribes to all server events with the specified listener, which only triggers once.
@@ -2950,7 +3082,7 @@ declare module "alt-client" {
    * @param weathers An array containing the weather ids for the weather cycle.
    * @param multipliers An array containing the multipliers for the weather cycle.
    */
-  export function setWeatherCycle(weathers: Array<number>, multipliers: Array<number>): void;
+  export function setWeatherCycle(weathers: number[], multipliers: number[]): void;
 
   /**
    * Sets whether the weather sync is active.
@@ -2983,7 +3115,7 @@ declare module "alt-client" {
 
   export function toggleVoiceControls(state: boolean): void;
 
-  /* @alpha */
+  /* @beta */
   export function isFullScreen(): boolean;
 
   export class WebSocketClient extends BaseObject {
@@ -2993,7 +3125,7 @@ declare module "alt-client" {
      * @param id The id of the websocketclient.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): WebSocketClient | null;
 
@@ -3052,7 +3184,7 @@ declare module "alt-client" {
     /**
      * Gets all added sub protocols.
      */
-    public getSubProtocols(): string[];
+    public getSubProtocols(): readonly string[];
 
     /**
      * Sets the specified header to the specified value.
@@ -3068,7 +3200,7 @@ declare module "alt-client" {
      * @param eventName Name of the event.
      * @returns Array of listener functions for that event.
      */
-    public getEventListeners(eventName: string | null): ((...args: any[]) => void)[];
+    public getEventListeners(eventName: string | null): readonly ((...args: any[]) => void)[];
   }
 
   /**
@@ -3111,7 +3243,7 @@ declare module "alt-client" {
    * @param eventName Name of the event or null for generic event.
    * @returns Array of listener functions for that event.
    */
-  export function getRemoteEventListeners(eventName: string | null): ((...args: any[]) => void)[];
+  export function getRemoteEventListeners(eventName: string | null): readonly ((...args: any[]) => void)[];
 
   export class HttpClient extends BaseObject {
     public constructor();
@@ -3122,7 +3254,7 @@ declare module "alt-client" {
      * @param id The id of the httpclient.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): HttpClient | null;
 
@@ -3303,7 +3435,7 @@ declare module "alt-client" {
      * @param id The id of the rmldocument.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): RmlDocument | null;
 
@@ -3331,7 +3463,7 @@ declare module "alt-client" {
 
     public off(eventName: string, func: (...args: any[]) => void): void;
 
-    public getEventListeners(eventName: string): ((senderElement: RmlElement, ...args: any[]) => void)[];
+    public getEventListeners(eventName: string): readonly ((senderElement: RmlElement, ...args: any[]) => void)[];
 
     public readonly relativeOffset: shared.Vector2;
 
@@ -3399,7 +3531,7 @@ declare module "alt-client" {
 
     public readonly ownerDocument: RmlDocument;
 
-    public readonly childNodes: ReadonlyArray<RmlElement>;
+    public readonly childNodes: readonly RmlElement[];
 
     public appendChild(child: RmlElement): void;
 
@@ -3415,7 +3547,7 @@ declare module "alt-client" {
 
     public hasClass(name: string): boolean;
 
-    public getClassList(): ReadonlyArray<string>;
+    public getClassList(): readonly string[];
 
     public addPseudoClass(name: string): boolean;
 
@@ -3423,7 +3555,7 @@ declare module "alt-client" {
 
     public hasPseudoClass(name: string): boolean;
 
-    public getPseudoClassList(): ReadonlyArray<string>;
+    public getPseudoClassList(): readonly string[];
 
     public setOffset(element: RmlElement, offset: shared.IVector2, fixed?: boolean): void;
 
@@ -3457,13 +3589,13 @@ declare module "alt-client" {
 
     public getElementByID(id: string): RmlElement | null;
 
-    public getElementsByTagName(tag: string): ReadonlyArray<RmlElement>;
+    public getElementsByTagName(tag: string): readonly RmlElement[];
 
-    public getElementsByClassName(className: string): ReadonlyArray<RmlElement>;
+    public getElementsByClassName(className: string): readonly RmlElement[];
 
     public querySelector(selector: string): RmlElement | null;
 
-    public querySelectorAll(selector: string): ReadonlyArray<RmlElement>;
+    public querySelectorAll(selector: string): readonly RmlElement[];
 
     public focus(): boolean;
 
@@ -3569,6 +3701,17 @@ declare module "alt-client" {
      */
     export function getClosestWorldObject(options?: { pos?: shared.IVector3; range?: number }): Object | null;
 
+    /**
+     * Finds the closest virtualEntity (if any) from {@link VirtualEntity.streamedIn alt.VirtualEntity.streamedIn}.
+     *
+     * `pos` - From which position to look for the nearest virtualEntity. Defaults to local player position.
+     *
+     * `range` - In which range to search for the nearest virtualEntity. Defaults to `Infinity`.
+     *
+     * @beta
+     */
+    export function getClosestVirtualEntity(options?: { pos?: shared.IVector3; range?: number }): VirtualEntity | null;
+
     export class Keybind {
       /**
        * Binds a callback to a specific key or multiple keys.
@@ -3586,7 +3729,7 @@ declare module "alt-client" {
        * ```
        *
        */
-      constructor(keyCode: shared.KeyCode | Array<shared.KeyCode>, callback: () => void, eventType?: "keyup" | "keydown");
+      constructor(keyCode: shared.KeyCode | shared.KeyCode[], callback: () => void, eventType?: "keyup" | "keydown");
       public destroy(): void;
     }
 
@@ -3665,6 +3808,14 @@ declare module "alt-client" {
   export function setMinimapComponentPosition(name: string, alignX: string, alignY: string, posX: number, posY: number, sizeX: number, sizeY: number): void;
 
   /**
+   * @beta
+   * Reset minimap default component position.
+   *
+   * @param name Name of the minimap component.
+   */
+  export function resetMinimapComponentPosition(name: string): void;
+
+  /**
    * Defines if the minimap is a rectangle to change the blip clipping.
    *
    * @param state False will clip the blips rounded to the minimap.
@@ -3714,6 +3865,9 @@ declare module "alt-client" {
      * Initializes a new instance of the {@link WeaponData}.
      */
     public static getForHash(weaponHash: number): WeaponData;
+
+    /** @beta */
+    public static allHashes: readonly WeaponData[];
   }
 
   export function loadDefaultIpls(): void;
@@ -3724,7 +3878,7 @@ declare module "alt-client" {
 
   export function getPedBonePos(ped: number, boneId: number): shared.Vector3;
 
-  export class Object extends Entity {
+  export class LocalObject extends Object {
     /**
      * Creates a new object.
      *
@@ -3741,12 +3895,20 @@ declare module "alt-client" {
      */
     constructor(model: string | number, pos: shared.Vector3, rot: shared.Vector3, noOffset?: boolean, dynamic?: boolean, useStreaming?: boolean, streamingDistance?: number);
 
-    public static readonly all: ReadonlyArray<Object>;
+    public static readonly all: readonly LocalObject[];
 
-    public static readonly allWorld: ReadonlyArray<Object>;
+    public static readonly allWorld: readonly LocalObject[];
 
-    /** @alpha */
-    public readonly count: number;
+    /**
+     * Retrieves the ped from the pool.
+     *
+     * @param id The id of the ped.
+     * @returns Entity if it was found, otherwise null.
+     */
+    public static getByID(id: number): LocalObject | null;
+
+    /** @beta */
+    public static readonly count: number;
 
     public pos: shared.Vector3;
 
@@ -3767,31 +3929,31 @@ declare module "alt-client" {
     /** Whether the object is affected by gravity. */
     public hasGravity: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isStreamedIn: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly useStreaming: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly streamingDistance: number;
 
-    /** @alpha */
+    /** @beta */
     public visible: boolean;
 
     /**
      * Attaches the object to another entity.
      *
      * @param entity Entity or scriptID of the entity the object should be attached to.
-     * @param bone Bone index of the entity to attach to. (-1 for entity center).
+     * @param boneIndex Bone index of the entity to attach to. (-1 for entity center).
      * @param offset Offset of the object.
      * @param rot Rotation of the object in radians.
      * @param useSoftPinning Whether the object should be able to detach when not fixed.
      * @param collision Whether the object and the entity should collide with each other.
      * @param fixedRot Whether the rotation of the object is fixed or follows that of the entity.
      */
-    public attachToEntity(entity: Entity, bone: number, offset: shared.Vector3, rot: shared.Vector3, useSoftPinning?: boolean, collision?: boolean, fixedRot?: boolean): void;
-    public attachToEntity(scriptID: number, bone: number, offset: shared.Vector3, rot: shared.Vector3, useSoftPinning?: boolean, collision?: boolean, fixedRot?: boolean): void;
+    public attachToEntity(entity: Entity, boneIndex: number, offset: shared.Vector3, rot: shared.Vector3, useSoftPinning?: boolean, collision?: boolean, fixedRot?: boolean): void;
+    public attachToEntity(scriptID: number, boneIndex: number, offset: shared.Vector3, rot: shared.Vector3, useSoftPinning?: boolean, collision?: boolean, fixedRot?: boolean): void;
 
     /**
      * Detaches the object from the current attached entity.
@@ -3820,13 +3982,13 @@ declare module "alt-client" {
     public waitForSpawn(timeout?: number): Promise<void>;
   }
 
-  /** @alpha */
-  export class WeaponObject extends Object {
+  /** @beta */
+  export class WeaponObject extends LocalObject {
     constructor(weaponHash: string | number, pos: shared.Vector3, rot: shared.Vector3, modelHash?: string | number, numAmmo?: number, createDefaultComponents?: boolean, scale?: number, useStreaming?: boolean, streamingDistance?: number);
 
-    public static readonly all: ReadonlyArray<WeaponObject>;
+    public static readonly all: readonly WeaponObject[];
 
-    public readonly count: number;
+    public static readonly count: number;
 
     public readonly isWeaponObject: boolean;
 
@@ -3841,21 +4003,21 @@ declare module "alt-client" {
     public removeComponent(componentType: number): void;
   }
 
-  /** @alpha */
-  export class NetworkObject extends Entity {
-    public static readonly all: ReadonlyArray<NetworkObject>;
+  /** @beta */
+  export class Object extends Entity {
+    public static readonly all: readonly Object[];
 
-    public readonly count: number;
+    public static readonly count: number;
 
-    public alpha: number;
+    public readonly alpha: number;
 
-    public textureVariation: number;
+    public readonly textureVariation: number;
 
     /** The distance at which the LOD model of the object starts being applied. */
-    public lodDistance: number;
+    public readonly lodDistance: number;
   }
 
-  /** @alpha */
+  /** @beta */
   export class Ped extends Entity {
     /**
      * Retrieves the ped from the pool.
@@ -3873,9 +4035,11 @@ declare module "alt-client" {
      */
     public static getByScriptID(scriptID: number): Ped | null;
 
-    public static readonly all: ReadonlyArray<Ped>;
+    public static readonly all: readonly Ped[];
 
-    public readonly count: number;
+    public static readonly streamedIn: readonly Ped[];
+
+    public static readonly count: number;
 
     /**
      * Currently equipped weapon.
@@ -3896,9 +4060,39 @@ declare module "alt-client" {
      * Current armour.
      */
     public readonly armour: number;
+
+    // normal meta
+
+    public setMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<ICustomPedMeta, K>): void;
+    public setMeta<K extends shared.ExtractStringKeys<ICustomPedMeta>>(key: K, value: ICustomPedMeta[K]): void;
+
+    public deleteMeta(key: string): void;
+    public deleteMeta<K extends shared.ExtractStringKeys<ICustomPedMeta>>(key: K): void;
+
+    public getMeta<K extends string>(key: Exclude<K, keyof ICustomPedMeta>): unknown;
+    public getMeta<K extends shared.ExtractStringKeys<ICustomPedMeta>>(key: K): ICustomPedMeta[K] | undefined;
+
+    public hasMeta(key: string): boolean;
+    public hasMeta<K extends shared.ExtractStringKeys<ICustomPedMeta>>(key: K): boolean;
+
+    // synced meta
+
+    public getSyncedMeta<K extends string>(key: Exclude<K, keyof shared.ICustomPedSyncedMeta>): unknown;
+    public getSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPedSyncedMeta>>(key: K): shared.ICustomPedSyncedMeta[K] | undefined;
+
+    public hasSyncedMeta(key: string): boolean;
+    public hasSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPedSyncedMeta>>(key: K): boolean;
+
+    // stream synced meta
+
+    public getStreamSyncedMeta<K extends string>(key: Exclude<K, keyof shared.ICustomPedStreamSyncedMeta>): unknown;
+    public getStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPedStreamSyncedMeta>>(key: K): shared.ICustomPedStreamSyncedMeta[K] | undefined;
+
+    public hasStreamSyncedMeta(key: string): boolean;
+    public hasStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPedStreamSyncedMeta>>(key: K): boolean;
   }
 
-  /** @alpha */
+  /** @beta */
   export class AudioFilter extends BaseObject {
     constructor(filtername: string);
 
@@ -3916,9 +4110,42 @@ declare module "alt-client" {
     public addPitchshiftEffect(fPitchShift: number, fSemitones: number, lFFTsize: number, lOsamp: number, priority: number): number;
     public addFreeverbEffect(fDryMix: number, fWetMix: number, fRoomSize: number, fDamp: number, fWidth: number, lMode: number, priority: number): number;
     public removeEffect(hfxHandler: number): boolean;
+
+    public get audioCategory(): number;
+    public set audioCategory(audioCategory: number | string);
+
+    public readonly hash: number;
   }
 
-  /** @alpha */
+  /** @beta */
+  /**
+   * With the AudioCategory class you can get specific audio category values and also set some of them.
+   */
+  export class AudioCategory {
+    protected constructor();
+
+    public readonly name: string;
+    public volume: number;
+    public distanceRolloffScale: number;
+    public plateauRolloffScale: number;
+    public occlusionDamping: number;
+    public environmentalFilterDamping: number;
+    public sourceReverbDamping: number;
+    public distanceReverbDamping: number;
+    public interiorReverbDamping: number;
+    public environmentalLoudness: number;
+    public underwaterWetLevel: number;
+    public stonedWetLevel: number;
+    public pitch: number;
+    public lowPassFilterCutoff: number;
+    public highPassFilterCutoff: number;
+    /**
+     * Initializes a new instance of the {@link AudioCategory}.
+     */
+    public static getForName(categoryName: string): AudioCategory;
+  }
+
+  /** @beta */
   export class Marker extends WorldObject {
     public constructor(type: shared.MarkerType, position: shared.Vector3, color: shared.RGBA, useStreaming?: boolean, streamingDistance?: number);
 
@@ -3930,7 +4157,7 @@ declare module "alt-client" {
      */
     public static getByID(id: number): Marker | null;
 
-    public static readonly all: ReadonlyArray<Marker>;
+    public static readonly all: readonly Marker[];
 
     public visible: boolean;
 
@@ -3959,10 +4186,9 @@ declare module "alt-client" {
     public bobUpAndDown: boolean;
   }
 
-  /** @alpha */
+  /** @beta */
   export class Colshape extends WorldObject {
-    /** @alpha */
-    public static readonly all: ReadonlyArray<Colshape>;
+    public static readonly all: readonly Colshape[];
 
     public readonly colshapeType: shared.ColShapeType;
 
@@ -3970,6 +4196,14 @@ declare module "alt-client" {
      * Whether this colshape should only trigger its enter/leave events for players or all entities.
      */
     public playersOnly: boolean;
+
+    public readonly radius: number;
+    public readonly height: number;
+    public readonly min: shared.Vector2 | shared.Vector3;
+    public readonly max: shared.Vector2 | shared.Vector3;
+    public readonly minZ: number;
+    public readonly maxZ: number;
+    public readonly points: readonly shared.Vector2[];
 
     /**
      * Retrieves the colshape from the pool.
@@ -4001,37 +4235,37 @@ declare module "alt-client" {
     public setMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<ICustomColshapeMeta, K, V>): void;
   }
 
-  /** @alpha */
+  /** @beta */
   export class ColshapeCylinder extends Colshape {
     constructor(x: number, y: number, z: number, radius: number, height: number);
   }
 
-  /** @alpha */
+  /** @beta */
   export class ColshapeSphere extends Colshape {
     constructor(x: number, y: number, z: number, radius: number);
   }
 
-  /** @alpha */
+  /** @beta */
   export class ColshapeCircle extends Colshape {
     constructor(x: number, y: number, radius: number);
   }
 
-  /** @alpha */
+  /** @beta */
   export class ColshapeCuboid extends Colshape {
     constructor(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number);
   }
 
-  /** @alpha */
+  /** @beta */
   export class ColshapeRectangle extends Colshape {
     constructor(x1: number, y1: number, x2: number, y2: number);
   }
 
-  /** @alpha */
+  /** @beta */
   export class ColshapePolygon extends Colshape {
-    constructor(minZ: number, maxZ: number, points: Array<shared.IVector2>);
+    constructor(minZ: number, maxZ: number, points: shared.IVector2[]);
   }
 
-  /** @alpha */
+  /** @beta */
   export class TextLabel extends WorldObject {
     public constructor(text: string, fontName: string, fontSize: number, scale: number, pos: shared.IVector3, rot: shared.IVector3, color: shared.RGBA, outlineWidth: number, outlineColor: shared.RGBA, useStreaming?: boolean, streamingDistance?: number);
 
@@ -4043,7 +4277,7 @@ declare module "alt-client" {
      */
     public static getByID(id: number): TextLabel | null;
 
-    //public static readonly all: ReadonlyArray<TextLabel>;
+    //public static readonly all: readonly TextLabel[];
 
     public visible: boolean;
 
@@ -4064,7 +4298,7 @@ declare module "alt-client" {
     public faceCamera: boolean;
   }
 
-  /** @alpha */
+  /** @beta */
   export class LocalVehicle extends WorldObject {
     public constructor(model: string | number, dimension: number, pos: shared.IVector3, rot: shared.IVector3, useStreaming?: boolean, streamingDistance?: number);
 
@@ -4083,6 +4317,9 @@ declare module "alt-client" {
      * @returns Entity if it was found, otherwise null.
      */
     public static getByScriptID(scriptID: number): LocalVehicle | null;
+
+    /** Waits asynchronously until the vehicle spawns. */
+    public waitForSpawn(timeout?: number): Promise<void>;
 
     public get model(): number;
     public set model(model: number | string);
@@ -4264,9 +4501,18 @@ declare module "alt-client" {
      * The vehicle's oil level.
      */
     public oilLevel: number;
+
+    /**
+     * @remarks Setter needs to be called in everytick and engine must be off.
+     * @beta
+     */
+    public steeringAngle: number;
+
+    /** @beta */
+    public suspensionHeight: number;
   }
 
-  /** @alpha */
+  /** @beta */
   export class LocalPed extends Ped {
     public constructor(model: string | number, dimension: number, pos: shared.IVector3, rot: shared.IVector3, useStreaming?: boolean, streamingDistance?: number);
 
@@ -4286,6 +4532,9 @@ declare module "alt-client" {
      */
     public static getByScriptID(scriptID: number): LocalPed | null;
 
+    /** Waits asynchronously until the vehicle spawns. */
+    public waitForSpawn(timeout?: number): Promise<void>;
+
     public get model(): number;
     public set model(model: number | string);
 
@@ -4300,7 +4549,7 @@ declare module "alt-client" {
     public readonly isStreamedIn: boolean;
   }
 
-  /** @alpha */
+  /** @beta */
   export class Font extends BaseObject {
     protected constructor();
 

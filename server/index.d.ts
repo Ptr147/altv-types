@@ -54,21 +54,6 @@ declare module "alt-server" {
     Unknown = -1,
   }
 
-  export const enum BlipType {
-    Vehicle = 1,
-    Ped,
-    Object,
-    Destination,
-    Cont,
-    PickupUnk,
-    Radius,
-    Pickup,
-    Cop,
-    Area,
-    Gallery,
-    PickupObject,
-  }
-
   export const enum RadioStation {
     LosSantosRockRadio,
     NonStopPopFm,
@@ -229,10 +214,11 @@ declare module "alt-server" {
     Green,
   }
 
-  export interface IWeapon {
-    readonly hash: number;
-    readonly tintIndex: number;
-    readonly components: ReadonlyArray<number>;
+  export const enum BaseObjectFilterType {
+    Player = 1,
+    Vehicle = 2,
+    Ped = 4,
+    Object = 8,
   }
 
   export interface IConnectionInfo {
@@ -248,13 +234,13 @@ declare module "alt-server" {
     readonly passwordHash: string;
     readonly ip: string;
     readonly discordUserID: string;
-    /** @alpha */
+    /** @beta */
     readonly socialClubName: string;
-    /** @alpha */
+    /** @beta */
     readonly id: number;
-    /** @alpha */
-    readonly cloudAuthHash: string;
     readonly isAccepted: boolean;
+    /** @beta */
+    text: string;
 
     /**
      * Accepts client connection.
@@ -263,12 +249,15 @@ declare module "alt-server" {
      */
     accept: (sendNames?: boolean) => void;
     decline: (reason: string) => void;
+
+    /** @beta */
+    requestCloudID: () => Promise<string>;
   }
 
   export class ConnectionInfo {
-    /** @alpha */
-    static readonly all: ReadonlyArray<IConnectionInfo>;
-    /** @alpha */
+    /** @beta */
+    static readonly all: readonly IConnectionInfo[];
+    /** @beta */
     static getByID(id: number): IConnectionInfo | null;
   }
 
@@ -315,16 +304,16 @@ declare module "alt-server" {
     resourceStop: () => void;
     resourceError: (error: Error, file: string, line: number, stackTrace: string) => void;
     syncedMetaChange: (entity: Entity, key: string, value: any, oldValue: any) => void;
-    streamSyncedMetaChange: (entity: Entity, key: string, value: any, oldValue: any) => void;
+    streamSyncedMetaChange: (object: BaseObject, key: string, value: any, oldValue: any) => void;
     globalMetaChange: (key: string, value: any, oldValue: any) => void;
     globalSyncedMetaChange: (key: string, value: any, oldValue: any) => void;
     vehicleAttach: (vehicle: Vehicle, attachedVehicle: Vehicle) => void;
     vehicleDestroy: (vehicle: Vehicle) => void;
     vehicleDetach: (vehicle: Vehicle, detachedVehicle: Vehicle) => void;
     weaponDamage: (source: Player, target: Entity, weaponHash: number, damage: number, offset: shared.Vector3, bodyPart: shared.BodyPart) => number | boolean | void;
-    startFire: (player: Player, fires: Array<IFireInfo>) => boolean | void;
+    startFire: (player: Player, fires: IFireInfo[]) => boolean | void;
     startProjectile: (player: Player, pos: shared.Vector3, dir: shared.Vector3, ammoHash: number, weaponHash: number) => boolean | void;
-    playerWeaponChange: (player: Player, oldWeapon: number, weapon: number) => boolean | void;
+    playerWeaponChange: (player: Player, oldWeapon: number, weapon: number) => void;
     vehicleDamage: (vehicle: Vehicle, attacker: Entity | null, bodyHealthDamage: number, additionalBodyHealthDamage: number, engineHealthDamage: number, petrolTankDamage: number, weapon: number) => void;
     localMetaChange: (player: Player, key: string, newValue: any, oldValue: any) => void;
     connectionQueueAdd: (connectionInfo: IConnectionInfo) => void;
@@ -334,18 +323,77 @@ declare module "alt-server" {
     playerAnimationChange: (target: Player, oldAnimDict: number, newAnimDict: number, oldAnimName: number, newAnimName: number) => void;
     playerInteriorChange: (player: Player, oldInterior: number, newInterior: number) => void;
     playerDimensionChange: (player: Player, oldDimension: number, newDimension: number) => void;
-    /** @alpha */
+    /** @beta */
     vehicleHorn: (vehicle: Vehicle, player: Player, state: boolean) => boolean | void;
-    /** @alpha */
+    /** @beta */
     vehicleSiren: (vehicle: Vehicle, state: boolean) => void;
-    /** @alpha */
+    /** @beta */
     playerSpawn: (player: Player) => void;
-    /** @alpha */
+    /** @beta */
     baseObjectCreate: (baseObject: BaseObject) => void;
-    /** @alpha */
+    /** @beta */
     baseObjectRemove: (baseObject: BaseObject) => void;
-    /** @alpha */
+    /** @beta */
     metaChange: (target: BaseObject, key: string, value: any, oldValue: any) => void;
+    /** @beta */
+    voiceConnection: (state: shared.VoiceConnectionState) => void;
+    /**
+     * @remarks You need to return true, otherwise the scene will not be synced.
+     *
+     * @beta
+     */
+    requestSyncedScene: (source: Player, sceneID: number) => void | boolean;
+    /**
+     * @remarks You need to return true, otherwise the scene will not be synced.
+     *
+     * @beta
+     */
+    startSyncedScene: (source: Player, sceneID: number, startPos: shared.Vector3, startRot: shared.Vector3, animDictHash: number, entityAnimPairs: { entity: BaseObject; animHash: number }[]) => void | boolean;
+    /**
+     * @remarks You need to return true, otherwise the scene will not be synced.
+     *
+     * @beta
+     */
+    stopSyncedScene: (source: Player, sceneID: number) => void | boolean;
+    /**
+     * @remarks You need to return true, otherwise the scene will not be synced.
+     *
+     * @beta
+     */
+    updateSyncedScene: (source: Player, startRate: number, sceneID: number) => void | boolean;
+
+    /**
+     * @remarks Triggers if player deletes a object of task.
+     *
+     * @beta
+     */
+    clientDeleteObject: (player: Player) => void | boolean;
+
+    /**
+     * @remarks Triggers if player request creation of a object, e.g for a task which is synced.
+     *
+     * @beta
+     */
+    clientRequestObject: (player: Player, model: number, position: shared.Vector3) => void | boolean;
+
+    /** @beta */
+    playerHeal: (player: Player, oldHealth: number, newHealth: number, oldArmour: number, newArmour: number) => void;
+
+    /** @alpha */
+    givePedScriptedTask: (source: Player, target: Ped, task: number) => void | boolean;
+
+    /** @alpha */
+    pedDamage: (ped: Ped, attacker: Entity | null, healthDamage: number, armourDamage: number, weapon: number) => void | boolean;
+
+    /** @alpha */
+    pedDeath: (ped: Ped, killer: Entity | null, weaponHash: number) => void | boolean;
+
+    /** @alpha */
+    pedHeal: (ped: Ped, oldHealth: number, newHealth: number, oldArmour: number, newArmour: number) => void | boolean;
+  }
+
+  interface IVehiclePassenger {
+    [seat: string]: Player;
   }
 
   export interface IFireInfo {
@@ -422,12 +470,14 @@ declare module "alt-server" {
     readonly interiorColor: number;
     readonly dashboardColor: number;
     readonly hasAutoAttachTrailer: boolean;
-    readonly availableModkits: ReadonlyArray<boolean>;
+    readonly availableModkits: readonly boolean[];
     hasExtra(extraId: number): boolean;
     hasDefaultExtra(extraId: number): boolean;
-    readonly bones: ReadonlyArray<IBoneInfo>;
-    /** @alpha */
+    readonly bones: readonly IBoneInfo[];
+    /** @beta */
     readonly canAttachCars: boolean;
+    /** @alpha */
+    readonly handlingNameHash: number;
   }
 
   export interface IPedModel {
@@ -437,10 +487,10 @@ declare module "alt-server" {
     readonly dlcName: string;
     readonly defaultUnarmedWeapon: string;
     readonly movementClipSet: string;
-    readonly bones: ReadonlyArray<IBoneInfo>;
+    readonly bones: readonly IBoneInfo[];
   }
 
-  /** @alpha */
+  /** @beta */
   export interface IWeaponModel {
     readonly hash: number;
     readonly name: string;
@@ -454,6 +504,31 @@ declare module "alt-server" {
     readonly skillAbove50MaxAmmoMp: number;
     readonly maxSkillMaxAmmoMp: number;
     readonly bonusMaxAmmoMp: number;
+  }
+
+  /** @beta */
+  export interface IAmmoFlags {
+    readonly infiniteAmmo: boolean;
+    readonly addSmokeOnExplosion: boolean;
+    readonly fuse: boolean;
+    readonly fixedAfterExplosion: boolean;
+  }
+
+  /** @beta */
+  export const enum AmmoSpecialType {
+    None,
+    ArmorPiercing,
+    Explosive,
+    FullMetalJacket,
+    HollowPoint,
+    Incendiary,
+    Tracer,
+  }
+
+  /** @beta */
+  export interface IDecoration {
+    readonly collection: number;
+    readonly overlay: number;
   }
 
   /**
@@ -513,11 +588,28 @@ declare module "alt-server" {
   export interface ICustomVehicleMeta extends ICustomEntityMeta {}
 
   /**
+   * Extend `alt.emit` auto-completion by merging interfaces for use with `alt.emit`.
+   *
+   * @example
+   * ```ts
+   * declare module 'alt-server' {
+   *    interface ICustomEmitEvent {
+   *        myEvent: (arg1: string, arg2: { key: string, value: number })
+   *    }
+   * }
+   * ```
+   *
+   * @export
+   * @interface ICustomEmitEvent
+   */
+  export interface ICustomEmitEvent {}
+
+  /**
    * Documentation: https://docs.altv.mp/articles/configs/server.html
    */
   export interface IServerConfig {
-    readonly resources: ReadonlyArray<string>;
-    readonly modules: ReadonlyArray<string>;
+    readonly resources: readonly string[];
+    readonly modules: readonly string[];
     readonly name?: string;
     readonly host?: string;
     readonly port?: number;
@@ -536,7 +628,7 @@ declare module "alt-server" {
     readonly announceRetryErrorDelay?: number;
     readonly announceRetryErrorAttempts?: number;
     readonly duplicatePlayers?: number;
-    readonly tags?: ReadonlyArray<string>;
+    readonly tags?: readonly string[];
     readonly useEarlyAuth?: boolean;
     readonly earlyAuthUrl?: string;
     readonly useCdn?: boolean;
@@ -548,7 +640,7 @@ declare module "alt-server" {
     readonly mapBoundsMaxY?: number;
     readonly mapCellAreaSize?: number;
     readonly colShapeTickRate?: number;
-    readonly logStream?: ReadonlyArray<string>;
+    readonly logStream?: readonly string[];
     readonly entityWorkerCount?: number;
     readonly connectionQueue?: boolean;
 
@@ -577,7 +669,7 @@ declare module "alt-server" {
       readonly "global-fetch"?: boolean;
       readonly "global-webcrypto"?: boolean;
       readonly "network-imports"?: boolean;
-      readonly "extra-cli-args"?: ReadonlyArray<string>;
+      readonly "extra-cli-args"?: readonly string[];
     };
 
     readonly "csharp-module"?: {
@@ -592,14 +684,10 @@ declare module "alt-server" {
    */
   export const rootDir: string;
 
-  export const defaultDimension: number;
-
-  export const globalDimension: number;
-
   export class BaseObject extends shared.BaseObject {
     /**
      * Gets the base object with the given type and id
-     * @alpha
+     * @beta
      */
     public getByID(type: shared.BaseObjectType, id: number): BaseObject;
 
@@ -655,25 +743,25 @@ declare module "alt-server" {
     public pos: shared.Vector3;
   }
 
-  /** @alpha */
+  /** @beta */
   export class VirtualEntityGroup extends BaseObject {
     /** Creates a new Virtual Entity Group */
     public constructor(maxEntitiesInStream: number);
 
     /** Returns all Virtual Entity Group instances */
-    public static readonly all: ReadonlyArray<VirtualEntityGroup>;
+    public static readonly all: readonly VirtualEntityGroup[];
 
     /** Maximum streaming range inside the Virtual Entity Group */
     public readonly maxEntitiesInStream: number;
   }
 
-  /** @alpha */
+  /** @beta */
   export class VirtualEntity extends WorldObject {
     /** Creates a new Virtual Entity */
     public constructor(group: VirtualEntityGroup, position: shared.Vector3, streamingDistance: number, data?: Record<string, any>);
 
     /** Returns all Virtual Entity instances */
-    public static readonly all: ReadonlyArray<VirtualEntity>;
+    public static readonly all: readonly VirtualEntity[];
 
     /** Virtual Entity Group this entity belongs to */
     public readonly group: VirtualEntityGroup;
@@ -703,7 +791,7 @@ declare module "alt-server" {
     public hasStreamSyncedMeta(key: string): boolean;
     public hasStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomVirtualEntityStreamSyncedMeta>>(key: K): boolean;
 
-    public getStreamSyncedMetaKeys(): ReadonlyArray<string>;
+    public getStreamSyncedMetaKeys(): readonly string[];
 
     /**
      * Stores the given value with the specified key.
@@ -742,7 +830,7 @@ declare module "alt-server" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Entity>;
+    public static readonly all: readonly Entity[];
 
     /**
      * Network owner of the entity.
@@ -822,7 +910,7 @@ declare module "alt-server" {
     public hasSyncedMeta(key: string): boolean;
     public hasSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntitySyncedMeta>>(key: K): boolean;
 
-    public getSyncedMetaKeys(): ReadonlyArray<string>;
+    public getSyncedMetaKeys(): readonly string[];
 
     /**
      * Stores the given value with the specified key.
@@ -865,7 +953,7 @@ declare module "alt-server" {
     public hasStreamSyncedMeta(key: string): boolean;
     public hasStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomEntityStreamSyncedMeta>>(key: K): boolean;
 
-    public getStreamSyncedMetaKeys(): ReadonlyArray<string>;
+    public getStreamSyncedMetaKeys(): readonly string[];
 
     /**
      * Stores the given value with the specified key.
@@ -929,7 +1017,7 @@ declare module "alt-server" {
 
     public collision: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly timestamp: number;
   }
 
@@ -948,15 +1036,15 @@ declare module "alt-server" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Player>;
-    /** @alpha */
-    public readonly streamedEntities: ReadonlyArray<{ entity: Entity; distance: number }>;
-    /** @alpha */
-    public readonly count: number;
+    public static readonly all: readonly Player[];
+    /** @beta */
+    public readonly streamedEntities: readonly { entity: Entity; distance: number }[];
+    /** @beta */
+    public static readonly count: number;
     public armour: number;
     public currentWeapon: number;
-    public readonly weapons: ReadonlyArray<IWeapon>;
-    public readonly currentWeaponComponents: ReadonlyArray<number>;
+    public readonly weapons: readonly shared.IWeapon[];
+    public readonly currentWeaponComponents: readonly number[];
     public readonly currentWeaponTintIndex: number;
     public readonly entityAimOffset: shared.Vector3;
     public readonly entityAimingAt: Entity | null;
@@ -976,20 +1064,23 @@ declare module "alt-server" {
      */
     public readonly isReloading: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isEnteringVehicle: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isLeavingVehicle: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isOnLadder: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isInMelee: boolean;
 
-    /** @alpha */
+    /** @beta */
     public readonly isInCover: boolean;
+
+    /** @beta */
+    public readonly isParachuting: boolean;
 
     /**
      * Position the player is currently aiming at.
@@ -1018,14 +1109,12 @@ declare module "alt-server" {
     public readonly isStealthy: boolean;
     public readonly isSpawned: boolean;
     public readonly socialID: string;
-    /** @alpha */
+    /** @beta */
     public readonly socialClubName: string;
     public readonly hwidHash: string;
     public readonly hwidExHash: string;
     public readonly authToken: string;
     public readonly discordID: string;
-    /** @alpha */
-    public readonly cloudAuthHash: string;
     public readonly currentAnimationDict: number;
     public readonly currentAnimationName: number;
     public readonly forwardSpeed: number;
@@ -1052,7 +1141,9 @@ declare module "alt-server" {
      * @param eventName Name of the event.
      * @param args Rest parameters for emit to send.
      */
-    public emit(eventName: string, ...args: any[]): void;
+
+    public emit<K extends keyof shared.ICustomServerClientEvent>(eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+    public emit<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
     /**
      * Emits specified event to client, but faster as {@link Player.emit}.
@@ -1060,11 +1151,12 @@ declare module "alt-server" {
      * @param eventName Name of the event.
      * @param args Rest parameters for emit to send.
      */
-    public emitRaw(eventName: string, ...args: any[]): void;
+    public emitRaw<K extends keyof shared.ICustomServerClientEvent>(eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+    public emitRaw<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
     public addWeaponComponent(weaponHash: number, component: number): void;
 
-    /** @alpha */
+    /** @beta */
     public hasWeaponComponent(weaponModel: string | number, component: string | number): boolean;
 
     /**
@@ -1099,7 +1191,7 @@ declare module "alt-server" {
      */
     public giveWeapon(weaponModel: string | number, ammo: number, equipNow: boolean): void;
 
-    /** @alpha */
+    /** @beta */
     public hasWeapon(weaponModel: string | number): boolean;
 
     /**
@@ -1356,23 +1448,74 @@ declare module "alt-server" {
 
     public getHairHighlightColor(): number;
 
-    /** @alpha */
+    /** @beta */
+    public addDecoration(collection: string | number, overlay: string | number): void;
+
+    /** @beta */
+    public removeDecoration(collection: string | number, overlay: string | number): void;
+
+    /** @beta */
+    public clearDecorations(): void;
+
+    /** @beta */
+    public getDecorations(): readonly IDecoration[];
+
+    /** @beta */
     public playAnimation(animDict: string, animName: string, blendInSpeed?: number, blendOutSpeed?: number, duration?: number, flags?: number, playbackRate?: number, lockX?: boolean, lockY?: boolean, lockZ?: boolean): void;
 
-    /** @alpha */
+    /** @beta */
     public clearTasks(): void;
 
-    /** @alpha */
+    /** @beta */
+    public playScenario(name: string): void;
+
+    /** @beta */
     public getAmmo(ammoHash: number | string): number;
 
-    /** @alpha */
+    /** @beta */
     public setAmmo(ammoHash: number | string, ammo: number): void;
 
-    /** @alpha */
+    /** @beta */
     public getWeaponAmmo(weaponHash: number | string): number;
 
-    /** @alpha */
+    /** @beta */
     public setWeaponAmmo(weaponHash: number | string, ammo: number): void;
+
+    /** @beta */
+    public getAmmoSpecialType(ammoHash: number | string): AmmoSpecialType;
+
+    /** @beta */
+    public setAmmoSpecialType(ammoHash: number | string, ammoSpecialType: AmmoSpecialType): void;
+
+    /** @beta */
+    public getAmmoFlags(ammoHash: number | string): IAmmoFlags;
+
+    /** @beta */
+    public setAmmoFlags(ammoHash: number | string, infiniteAmmo: boolean, addSmokeOnExplosion: boolean, fuse: boolean, fixedAfterExplosion: boolean): void;
+
+    /** @beta */
+    public getAmmoMax(ammoHash: number | string): number;
+
+    /** @beta */
+    public setAmmoMax(ammoHash: number | string, ammoMax: number): void;
+
+    /** @beta */
+    public getAmmoMax50(ammoHash: number | string): number;
+
+    /** @beta */
+    public setAmmoMax50(ammoHash: number | string, ammoMax: number): void;
+
+    /** @beta */
+    public getAmmoMax100(ammoHash: number | string): number;
+
+    /** @beta */
+    public setAmmoMax100(ammoHash: number | string, ammoMax: number): void;
+
+    /** @beta */
+    public netOwnershipDisabled: boolean;
+
+    /** @beta */
+    public requestCloudID(): Promise<string>;
 
     // local meta
 
@@ -1404,7 +1547,7 @@ declare module "alt-server" {
     public hasLocalMeta(key: string): boolean;
     public hasLocalMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerLocalMeta>>(key: K): boolean;
 
-    public getLocalMetaKeys(): ReadonlyArray<string>;
+    public getLocalMetaKeys(): readonly string[];
 
     // normal meta
 
@@ -1495,10 +1638,10 @@ declare module "alt-server" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Vehicle>;
+    public static readonly all: readonly Vehicle[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
 
     /**
      * Get the entity model hash.
@@ -1645,6 +1788,23 @@ declare module "alt-server" {
      *
      */
     public readonly driver: Player | null;
+
+    /**
+     * Gets all passengers of the vehicle including the driver itself.
+     *
+     * @example
+     * ```js
+     * const someVehicle = new alt.Vehicle('elegy', 0, 0, 0, 0, 0, 0);
+     * const passengers = someVehicle.passengers;
+     *
+     * for (const [seat, player] of Object.entries(passengers)) {
+     *    alt.log(`Seat: ${seat} - Player: ${player.name}`);
+     * }
+     * ```
+     *
+     * @beta
+     */
+    public readonly passengers: IVehiclePassenger;
 
     /**
      * Gets or sets the current engine health.
@@ -1852,7 +2012,7 @@ declare module "alt-server" {
 
     /**
      * Gets or sets the vehicles rotation with a quaternion.
-     * @alpha
+     * @beta
      */
     public quaternion: shared.Quaternion;
 
@@ -2333,11 +2493,14 @@ declare module "alt-server" {
     /**
      * Gets or sets the status of the boat anchor.
      *
-     * @alpha
+     * @beta
      */
     public boatAnchorActive: boolean;
 
     public lightState: number;
+
+    /** @beta */
+    public hornActive: boolean;
 
     public setTimedExplosion(state: boolean, culprit: Player, time: number): void;
 
@@ -2363,6 +2526,15 @@ declare module "alt-server" {
     public hybridExtraActive: boolean;
 
     public hybridExtraState: number;
+
+    /** @beta */
+    public readonly steeringAngle: number;
+
+    /** @beta */
+    public readonly accelerationLevel: number;
+
+    /** @beta */
+    public readonly brakeLevel: number;
 
     // normal meta
 
@@ -2434,10 +2606,10 @@ declare module "alt-server" {
      * }
      * ```
      */
-    public static readonly all: ReadonlyArray<Blip>;
+    public static readonly all: readonly Blip[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
 
     /**
      * Retrieves the blip from the pool.
@@ -2445,7 +2617,7 @@ declare module "alt-server" {
      * @param id The id of the blip.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): Blip | null;
 
@@ -2460,7 +2632,7 @@ declare module "alt-server" {
 
     public scale: number;
 
-    public color: shared.BlipColor;
+    public color: shared.BlipColor | number;
 
     public secondaryColor: number | shared.RGBA;
 
@@ -2518,6 +2690,30 @@ declare module "alt-server" {
 
     public fade(opacity: number, duration: number): void;
 
+    /** @beta */
+    public visible: boolean;
+
+    /** @beta */
+    public blipType: shared.BlipType;
+
+    /** @beta */
+    public isFriendly: boolean;
+
+    /** @beta */
+    public readonly isAttached: boolean;
+
+    /** @beta */
+    public isGlobal: boolean;
+
+    /** @beta */
+    public readonly targets: readonly Player[];
+
+    /** @beta */
+    public addTarget(player: Player): void;
+
+    /** @beta */
+    public removeTarget(player: Player): void;
+
     public deleteMeta(key: string): void;
     public deleteMeta<K extends shared.ExtractStringKeys<ICustomBlipMeta>>(key: K): void;
 
@@ -2536,24 +2732,24 @@ declare module "alt-server" {
   }
 
   export class AreaBlip extends Blip {
-    constructor(x: number, y: number, z: number, width: number, height: number);
+    constructor(x: number, y: number, z: number, width: number, height: number, global: boolean);
   }
 
   export class RadiusBlip extends Blip {
-    constructor(x: number, y: number, z: number, radius: number);
+    constructor(x: number, y: number, z: number, radius: number, global: boolean);
   }
 
   export class PointBlip extends Blip {
-    constructor(x: number, y: number, z: number);
+    constructor(x: number, y: number, z: number, global: boolean);
 
-    constructor(pos: shared.IVector3);
+    constructor(pos: shared.IVector3, global: boolean);
 
-    constructor(entity: Entity);
+    constructor(entity: Entity, global: boolean);
   }
 
   export class Colshape extends WorldObject {
-    /** @alpha */
-    public static readonly all: ReadonlyArray<Colshape>;
+    /** @beta */
+    public static readonly all: readonly Colshape[];
 
     public readonly colshapeType: shared.ColShapeType;
 
@@ -2562,13 +2758,28 @@ declare module "alt-server" {
      */
     public playersOnly: boolean;
 
+    /** @beta */
+    public readonly radius: number;
+    /** @beta */
+    public readonly height: number;
+    /** @beta */
+    public readonly min: shared.Vector2 | shared.Vector3;
+    /** @beta */
+    public readonly max: shared.Vector2 | shared.Vector3;
+    /** @beta */
+    public readonly minZ: number;
+    /** @beta */
+    public readonly maxZ: number;
+    /** @beta */
+    public readonly points: readonly shared.Vector2[];
+
     /**
      * Retrieves the colshape from the pool.
      *
      * @param id The id of the colshape.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): Colshape | null;
 
@@ -2615,7 +2826,7 @@ declare module "alt-server" {
   }
 
   export class ColshapePolygon extends Colshape {
-    constructor(minZ: number, maxZ: number, points: Array<shared.IVector2>);
+    constructor(minZ: number, maxZ: number, points: shared.IVector2[]);
   }
 
   export class Checkpoint extends Colshape {
@@ -2625,17 +2836,17 @@ declare module "alt-server" {
     /**
      * Streaming range for the checkpoint
      *
-     * @alpha
+     * @beta
      */
     public readonly streamingDistance: number;
 
-    /** @alpha */
-    public static readonly all: ReadonlyArray<Checkpoint>;
+    /** @beta */
+    public static readonly all: readonly Checkpoint[];
 
-    /** @alpha */
-    public readonly count: number;
+    /** @beta */
+    public static readonly count: number;
 
-    /** @alpha */
+    /** @beta */
     public visible: boolean;
 
     /**
@@ -2644,7 +2855,7 @@ declare module "alt-server" {
      * @param id The id of the checkpoint.
      * @returns Entity if it was found, otherwise null.
      *
-     * @alpha
+     * @beta
      */
     public static getByID(id: number): Checkpoint | null;
 
@@ -2660,28 +2871,28 @@ declare module "alt-server" {
     public setMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<ICustomCheckpointMeta, K>): void;
     public setMeta<K extends shared.ExtractStringKeys<ICustomCheckpointMeta>>(key: K, value: ICustomCheckpointMeta[K]): void;
 
-    /** @alpha */
+    /** @beta */
     public setStreamSyncedMeta<K extends string>(key: K, value: shared.InterfaceValueByKey<shared.ICustomPlayerStreamSyncedMeta, K>): void;
-    /** @alpha */
+    /** @beta */
     public setStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerStreamSyncedMeta>>(key: K, value: shared.ICustomPlayerStreamSyncedMeta[K]): void;
 
-    /** @alpha */
+    /** @beta */
     public deleteStreamSyncedMeta(key: string): void;
-    /** @alpha */
+    /** @beta */
     public deleteStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerStreamSyncedMeta>>(key: K): void;
 
-    /** @alpha */
+    /** @beta */
     public getStreamSyncedMeta<K extends string>(key: Exclude<K, keyof shared.ICustomPlayerStreamSyncedMeta>): unknown;
-    /** @alpha */
+    /** @beta */
     public getStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerStreamSyncedMeta>>(key: K): shared.ICustomPlayerStreamSyncedMeta[K] | undefined;
 
-    /** @alpha */
+    /** @beta */
     public hasStreamSyncedMeta(key: string): boolean;
-    /** @alpha */
+    /** @beta */
     public hasStreamSyncedMeta<K extends shared.ExtractStringKeys<shared.ICustomPlayerStreamSyncedMeta>>(key: K): boolean;
 
-    /** @alpha */
-    public getStreamSyncedMetaKeys(): ReadonlyArray<string>;
+    /** @beta */
+    public getStreamSyncedMetaKeys(): readonly string[];
   }
 
   export class VoiceChannel extends BaseObject {
@@ -2695,16 +2906,16 @@ declare module "alt-server" {
      */
     constructor(isSpatial: boolean, maxDistance: number);
 
-    /** @alpha */
+    /** @beta */
     public readonly maxDistance: number;
 
-    /** @alpha */
+    /** @beta */
     public readonly isSpatial: boolean;
 
-    /** @alpha */
+    /** @beta */
     public priority: number;
 
-    /** @alpha */
+    /** @beta */
     public filter: number;
 
     public addPlayer(player: Player): void;
@@ -2735,7 +2946,7 @@ declare module "alt-server" {
     /** @deprecated See {@link ICustomVoiceChannelMeta} */
     public setMeta<V extends any, K extends string = string>(key: K, value: shared.InterfaceValueByKey<ICustomVoiceChannelMeta, K, V>): void;
 
-    public readonly players: ReadonlyArray<Player>;
+    public readonly players: readonly Player[];
 
     public readonly playerCount: number;
   }
@@ -2744,7 +2955,7 @@ declare module "alt-server" {
     public readonly path: string;
 
     public static getByName(name: string): Resource | null;
-    public static readonly all: ReadonlyArray<Resource>;
+    public static readonly all: readonly Resource[];
     public static readonly current: Resource;
   }
 
@@ -2802,7 +3013,8 @@ declare module "alt-server" {
    * @param args Rest parameters for emit to send.
    */
   // Do not allow to emit alt:V event name
-  export function emit<K extends string>(eventName: Exclude<K, keyof IServerEvent>, ...args: any[]): void;
+  export function emit<K extends keyof ICustomEmitEvent>(eventName: K, ...args: Parameters<ICustomEmitEvent[K]>): void;
+  export function emit<K extends string>(eventName: Exclude<K, keyof IServerEvent | keyof ICustomEmitEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event across resources.
@@ -2813,69 +3025,42 @@ declare module "alt-server" {
    * @remarks Works only from JS resource to JS resource
    */
   // Do not allow to emit alt:V event name
-  export function emitRaw<K extends string>(eventName: Exclude<K, keyof IServerEvent>, ...args: any[]): void;
+  export function emitRaw<K extends keyof ICustomEmitEvent>(eventName: K, ...args: Parameters<ICustomEmitEvent[K]>): void;
+  export function emitRaw<K extends string>(eventName: Exclude<K, keyof IServerEvent | keyof ICustomEmitEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to specific client.
    *
-   * @param player Event is sent to specific player.
+   * @param player Event is sent to specific player or players.
    * @param eventName Name of the event.
    * @param args Rest parameters for emit to send.
    */
-  export function emitClient(player: Player, eventName: string, ...args: any[]): void;
-
-  /**
-   * Emits specified event to specific clients.
-   *
-   * @param player Event is sent to every player in array.
-   * @param eventName Name of the event.
-   * @param args Rest parameters for emit to send.
-   */
-  export function emitClient(player: Player[], eventName: string, ...args: any[]): void;
-
-  /**
-   * Emits specified event to specific clients.
-   *
-   * @param player Event is sent to every player in array.
-   * @param eventName Name of the event.
-   * @param args Rest parameters for emit to send.
-   */
-  export function emitClientRaw(player: Player[], eventName: string, ...args: any[]): void;
+  export function emitClient<K extends keyof shared.ICustomServerClientEvent>(player: Player | Player[], eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+  export function emitClient<K extends string>(player: Player | Player[], eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to specific client.
    *
-   * @param player Event is sent to specific player.
+   * @param player Event is sent to specific player or players.
    * @param eventName Name of the event.
    * @param args Rest parameters for emit to send.
    */
-  export function emitClientRaw(player: Player, eventName: string, ...args: any[]): void;
+  export function emitClientRaw<K extends keyof shared.ICustomServerClientEvent>(player: Player | Player[], eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+  export function emitClientRaw<K extends string>(player: Player | Player[], eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to specific client.
    *
-   * @param player Event is sent to specific player.
+   * @param player Event is sent to specific player or players.
    * @param eventName Name of the event.
    * @param args Rest parameters for emit to send.
    *
    * @remarks Unreliable event should be used when you don't need to be sure that event will be received by client.
    *
-   * @alpha
+   * @beta
    */
-  export function emitClientUnreliable(player: Player, eventName: string, ...args: any[]): void;
-
-  /**
-   * Emits specified event to specific clients.
-   *
-   * @param player Event is sent to every player in array.
-   * @param eventName Name of the event.
-   * @param args Rest parameters for emit to send.
-   *
-   * @remarks Unreliable event should be used when you don't need to be sure that event will be received by client.
-   *
-   * @alpha
-   */
-  export function emitClientUnreliable(player: Player[], eventName: string, ...args: any[]): void;
+  export function emitClientUnreliable<K extends keyof shared.ICustomServerClientEvent>(player: Player | Player[], eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+  export function emitClientUnreliable<K extends string>(player: Player | Player[], eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to all clients.
@@ -2883,7 +3068,8 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param args Rest parameters for emit to send.
    */
-  export function emitAllClients(eventName: string, ...args: any[]): void;
+  export function emitAllClients<K extends keyof shared.ICustomServerClientEvent>(eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+  export function emitAllClients<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to all clients.
@@ -2891,7 +3077,8 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param args Rest parameters for emit to send.
    */
-  export function emitAllClientsRaw(eventName: string, ...args: any[]): void;
+  export function emitAllClientsRaw<K extends keyof shared.ICustomServerClientEvent>(eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+  export function emitAllClientsRaw<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
   /**
    * Emits specified event to all clients.
@@ -2901,9 +3088,10 @@ declare module "alt-server" {
    *
    * @remarks Unreliable event should be used when you don't need to be sure that event will be received by client.
    *
-   * @alpha
+   * @beta
    */
-  export function emitAllClientsUnreliable(eventName: string, ...args: any[]): void;
+  export function emitAllClientsUnreliable<K extends keyof shared.ICustomServerClientEvent>(eventName: K, ...args: Parameters<shared.ICustomServerClientEvent[K]>): void;
+  export function emitAllClientsUnreliable<K extends string>(eventName: Exclude<K, keyof shared.ICustomServerClientEvent>, ...args: any[]): void;
 
   /**
    * Change the server password at runtime.
@@ -2922,11 +3110,6 @@ declare module "alt-server" {
   export function stopServer(): void;
 
   /**
-   * Gets the amount of milliseconds since the server was started.
-   */
-  export function getNetTime(): number;
-
-  /**
    * Unsubscribes from a client event with the specified listener.
    *
    * @remarks Listener should be of the same reference as when event was subscribed to.
@@ -2934,7 +3117,9 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param listener Listener that should be removed.
    */
-  export function offClient(eventName: string, listener: (...args: any[]) => void): void;
+  export function offClient<K extends keyof shared.ICustomClientServerEvent>(eventName: K, listener: (player: Player, ...args: Parameters<shared.ICustomClientServerEvent[K]>) => void): void;
+  export function offClient<K extends string>(eventName: Exclude<K, keyof shared.ICustomClientServerEvent>, listener: (player: Player, ...args: any[]) => void): void;
+  export function offClient(eventName: string, listener: (player: Player, ...args: any[]) => void): void;
 
   /**
    * Unsubscribes from all user-created client events with the specified listener.
@@ -2951,16 +3136,8 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function on<K extends keyof IServerEvent>(eventName: K, listener: IServerEvent[K]): void;
-
-  /**
-   * Subscribes to a custom server event with the specified listener.
-   *
-   * @param eventName Name of the event.
-   * @param listener Listener that should be added.
-   */
-  // Do not allow any function to subscribe to the alt:V event
-  export function on<K extends string>(eventName: K, listener: shared.InterfaceValueByKey<IServerEvent, K, (...args: any[]) => void, never>): void;
+  export function on<K extends keyof IServerEvent | keyof ICustomEmitEvent>(eventName: K, listener: (...args: shared.EventParameters<IServerEvent, ICustomEmitEvent, K>) => void): void;
+  export function on<K extends string>(eventName: Exclude<K, keyof IServerEvent | keyof ICustomEmitEvent>, listener: (...args: any[]) => void): void;
 
   /**
    * Subscribes to a server event with the specified listener, which only triggers once.
@@ -2968,25 +3145,8 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function once<K extends keyof IServerEvent>(eventName: K, listener: IServerEvent[K]): void;
-
-  /**
-   * Subscribes to a custom server event with the specified listener, which only triggers once.
-   *
-   * @param eventName Name of the event.
-   * @param listener Listener that should be added.
-   */
-  // Do not allow any function to subscribe to the alt:V event
-  export function once<K extends string>(eventName: K, listener: shared.InterfaceValueByKey<IServerEvent, K, (...args: any[]) => void, never>): void;
-
-  /**
-   * Subscribes to all events with the specified listener.
-   *
-   * @remarks Listener will be only called for user-created events.
-   *
-   * @param listener Listener that should be added.
-   */
-  export function on(listener: (eventName: string, ...args: any[]) => void): void;
+  export function once<K extends keyof IServerEvent | keyof ICustomEmitEvent>(eventName: K, listener: (...args: shared.EventParameters<IServerEvent, ICustomEmitEvent, K>) => void): void;
+  export function once<K extends string>(eventName: Exclude<K, keyof IServerEvent | keyof ICustomEmitEvent>, listener: (...args: any[]) => void): void;
 
   /**
    * Unsubscribes from a event with the specified listener.
@@ -2996,16 +3156,8 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param listener Listener that should be removed.
    */
-  export function off(eventName: string, listener: (...args: any[]) => void): void;
-
-  /**
-   * Unsubscribes from all user-created events with the specified listener.
-   *
-   * @remarks Listener should be of the same reference as when event was subscribed to.
-   *
-   * @param listener Listener that should be removed.
-   */
-  export function off(listener: (eventName: string, ...args: any[]) => void): void;
+  export function off<K extends keyof IServerEvent | keyof ICustomEmitEvent>(eventName: K, listener: (...args: shared.EventParameters<IServerEvent, ICustomEmitEvent, K>) => void): void;
+  export function off<K extends string>(eventName: Exclude<K, keyof IServerEvent | keyof ICustomEmitEvent>, listener: (...args: any[]) => void): void;
 
   /**
    * Subscribes to a client event with the specified listener.
@@ -3013,7 +3165,8 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function onClient(eventName: string, listener: (player: Player, ...args: any[]) => void): void;
+  export function onClient<K extends keyof shared.ICustomClientServerEvent>(eventName: K, listener: (player: Player, ...args: Parameters<shared.ICustomClientServerEvent[K]>) => void): void;
+  export function onClient<K extends string>(eventName: Exclude<K, keyof shared.ICustomClientServerEvent>, listener: (player: Player, ...args: any[]) => void): void;
 
   /**
    * Subscribes to all client events with the specified listener.
@@ -3030,7 +3183,8 @@ declare module "alt-server" {
    * @param eventName Name of the event.
    * @param listener Listener that should be added.
    */
-  export function onceClient(eventName: string, listener: (player: Player, ...args: any[]) => void): void;
+  export function onceClient<K extends keyof shared.ICustomClientServerEvent>(eventName: K, listener: (player: Player, ...args: Parameters<shared.ICustomClientServerEvent[K]>) => void): void;
+  export function onceClient<K extends string>(eventName: Exclude<K, keyof shared.ICustomClientServerEvent>, listener: (player: Player, ...args: any[]) => void): void;
 
   /**
    * Subscribes to all client events with the specified listener, which only triggers once.
@@ -3068,29 +3222,191 @@ declare module "alt-server" {
    * @param eventName Name of the event or null for generic event.
    * @returns Array of listener functions for that event.
    */
-  export function getRemoteEventListeners(eventName: string | null): ((...args: any[]) => void)[];
+  export function getRemoteEventListeners(eventName: string | null): readonly ((...args: any[]) => void)[];
 
   export function getVehicleModelInfoByHash(vehicleHash: number): IVehicleModel;
 
   export function getPedModelInfoByHash(pedModelHash: number): IPedModel;
 
-  /** @alpha */
+  /** @beta */
   export function getWeaponModelInfoByHash(weaponModelHash: number): IWeaponModel;
+
+  /** @beta */
+  export function getAmmoHashForWeaponHash(weaponModelHash: number): number;
 
   export function getServerConfig(): IServerConfig;
 
   export function toggleWorldProfiler(state: boolean): void;
 
-  /** @alpha */
-  export function getEntitiesInDimension(dimension: number, allowedTypes: shared.BaseObjectType): Entity[];
+  /**
+   * Returns all entities of the specified type (or types) in the specified dimension.
+   *
+   * @example
+   * ```ts
+   * // Returns all players and vehicles in zero dimension
+   * const playersAndVehicles = alt.getEntitiesInDimension(
+   *   0, // dimension
+   *   alt.BaseObjectFilterType.Player | alt.BaseObjectFilterType.Vehicle,
+   * );
+   *
+   * // Returns only players in zero dimension
+   * const players = alt.getEntitiesInDimension(
+   *   0, // dimension
+   *   alt.BaseObjectFilterType.Player,
+   * );
+   * ```
+   *
+   * @param dimension
+   * @param allowedTypes
+   *
+   * @beta
+   * */
+  export function getEntitiesInDimension(dimension: number, allowedTypes: BaseObjectFilterType): readonly Entity[];
 
-  /** @alpha */
-  export function getEntitiesInRange(position: shared.IVector3, range: number, dimension: number, allowedTypes: shared.BaseObjectType): Entity[];
+  /**
+   * Returns all entities of the specified type (or types) at the specified position, in the given range and dimension.
+   *
+   * @example
+   * ```ts
+   * // Returns all players and vehicles in a range equal to 3 and dimension equal to 0
+   * const playersAndVehicles = alt.getEntitiesInRange(
+   *   alt.Vector3.zero, // position
+   *   3.0, // range
+   *   0, // dimension
+   *   alt.BaseObjectFilterType.Player | alt.BaseObjectFilterType.Vehicle,
+   * );
+   *
+   * // Returns players in a range equal to 3 and dimension equal to 0
+   * const players = alt.getEntitiesInRange(
+   *   alt.Vector3.zero, // position
+   *   3.0, // range
+   *   0, // dimension
+   *   alt.BaseObjectFilterType.Player,
+   * );
+   * ```
+   * @param position
+   * @param range
+   * @param dimension
+   * @param allowedTypes
+   *
+   * @beta
+   * */
+  export function getEntitiesInRange(position: shared.IVector3, range: number, dimension: number, allowedTypes: BaseObjectFilterType): readonly Entity[];
 
-  /** @alpha */
-  export function getClosestEntities(position: shared.IVector3, range: number, dimension: number, limit: number, allowedTypes: shared.BaseObjectType): Entity[];
+  /**
+   * Returns only the closest entities of the specified type (or types) at the specified position, in the given range, dimension and limit.
+   *
+   * @example
+   * ```ts
+   * // Returns closest players and vehicles (from 0 to 2 entities inclusive, because limit is 2)
+   * // in a range equal to 3 and dimension equal to 0
+   * const playersAndVehicles = alt.getClosestEntities(
+   *   alt.Vector3.zero, // position
+   *   3.0, // range
+   *   0, // dimension
+   *   2, // limit
+   *   alt.BaseObjectFilterType.Player | alt.BaseObjectFilterType.Vehicle,
+   * );
+   *
+   * // Same but only players
+   * const players = alt.getClosestEntities(
+   *   alt.Vector3.zero, // position
+   *   3.0, // range
+   *   0, // dimension
+   *   2, // limit
+   *   alt.BaseObjectFilterType.Player,
+   * );
+   * ```
+   *
+   * @param position
+   * @param range
+   * @param dimension
+   * @param limit How many entities to return if there are more entities in the specified range, dimension. (`-1` to disable).
+   * @param allowedTypes
+   *
+   * @beta
+   * */
+  export function getClosestEntities(position: shared.IVector3, range: number, dimension: number, limit: number, allowedTypes: BaseObjectFilterType): readonly Entity[];
 
-  /** @alpha */
+  /** @beta */
+  export function setVoiceExternalPublic(host: string, port: number): void;
+
+  /** @beta */
+  export function setVoiceExternal(phost: string, port: number): void;
+
+  /** @beta */
+  export function getMaxStreamingPeds(): number;
+
+  /** @beta */
+  export function setMaxStreamingPeds(limit: number): void;
+
+  /** @beta */
+  export function getMaxStreamingObjects(): number;
+
+  /** @beta */
+  export function setMaxStreamingObjects(limit: number): void;
+
+  /** @beta */
+  export function getMaxStreamingVehicles(): number;
+
+  /** @beta */
+  export function setMaxStreamingVehicles(limit: number): void;
+
+  /** @beta */
+  export function getStreamerThreadCount(): void;
+
+  /** @beta */
+  export function setStreamerThreadCount(count: number): void;
+
+  /** @beta */
+  export function getStreamingTickRate(): void;
+
+  /** @beta */
+  export function setStreamingTickRate(count: number): void;
+
+  /** @beta */
+  export function getStreamingDistance(): void;
+
+  /** @beta */
+  export function setStreamingDistance(distance: number): void;
+
+  /** @beta */
+  export function getMigrationThreadCount(): void;
+
+  /** @beta */
+  export function setMigrationThreadCount(count: number): void;
+
+  /** @beta */
+  export function getSyncSendThreadCount(): void;
+
+  /** @beta */
+  export function setSyncSendThreadCount(count: number): void;
+
+  /** @beta */
+  export function getSyncReceiveThreadCount(): void;
+
+  /** @beta */
+  export function setSyncReceiveThreadCount(count: number): void;
+
+  /** @beta */
+  export function getMigrationTickRate(): void;
+
+  /** @beta */
+  export function setMigrationTickRate(count: number): void;
+
+  /** @beta */
+  export function getColShapeTickRate(): void;
+
+  /** @beta */
+  export function setColShapeTickRate(count: number): void;
+
+  /** @beta */
+  export function getMigrationDistance(): void;
+
+  /** @beta */
+  export function setMigrationDistance(count: number): void;
+
+  /** @beta */
   export class Ped extends Entity {
     constructor(model: string | number, position: shared.IVector3, rotation: shared.IVector3);
 
@@ -3102,21 +3418,21 @@ declare module "alt-server" {
      */
     public static getByID(id: number): Ped | null;
 
-    public static readonly all: ReadonlyArray<Ped>;
-    public readonly count: number;
+    public static readonly all: readonly Ped[];
+    public static readonly count: number;
     public currentWeapon: number;
     public health: number;
     public maxArmour: number;
     public amour: number;
   }
 
-  /** @alpha */
-  export class NetworkObject extends Entity {
+  /** @beta */
+  export class Object extends Entity {
     constructor(model: string | number, position: shared.IVector3, rotation: shared.IVector3, alpha?: number, textureVariation?: number, lodDistance?: number);
 
-    public static readonly all: ReadonlyArray<NetworkObject>;
+    public static readonly all: readonly Object[];
 
-    public readonly count: number;
+    public static readonly count: number;
 
     public activatePhysics(): void;
 
@@ -3132,7 +3448,7 @@ declare module "alt-server" {
     public lodDistance: number;
   }
 
-  /** @alpha */
+  /** @beta */
   export class Marker extends WorldObject {
     public constructor(type: shared.MarkerType, position: shared.Vector3, color: shared.RGBA);
 
@@ -3144,7 +3460,7 @@ declare module "alt-server" {
      */
     public static getByID(id: number): Marker | null;
 
-    public static readonly all: ReadonlyArray<Marker>;
+    public static readonly all: readonly Marker[];
 
     public visible: boolean;
 

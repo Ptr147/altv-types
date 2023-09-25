@@ -6,7 +6,7 @@ declare module "alt-shared" {
     Player,
     Vehicle,
     Ped,
-    NetworkObject,
+    Object,
     Blip,
     WebView,
     VoiceChannel,
@@ -15,10 +15,14 @@ declare module "alt-shared" {
     WebSocketClient,
     HttpClient,
     Audio,
+    AudioOutput,
+    AudioOutputWorld,
+    AudioOutputAttached,
+    AudioOutputFrontend,
     RmlElement,
     RmlDocument,
     LocalPlayer,
-    Object,
+    LocalObject,
     VirtualEntity,
     VirtualEntityGroup,
     Marker,
@@ -618,6 +622,163 @@ declare module "alt-shared" {
     ArenaScarab,
     ArenaSlamvan,
     ArenaZr,
+    AP,
+    ComicStore,
+    CopCar,
+    RCTimeTrials,
+    KingOfTheHill,
+    KingOfTheHillTeams,
+    Rucksack,
+    ShippingContainer,
+    Agatha,
+    Casino,
+    CasinoTableGames,
+    CasinoWheel,
+    CasinoConcierge,
+    CasinoChips,
+    CasinoHorseRacing,
+    AdversaryFeatured,
+    Roulette1,
+    Roulette2,
+    Roulette3,
+    Roulette4,
+    Roulette5,
+    Roulette6,
+    Roulette7,
+    Roulette8,
+    Roulette9,
+    Roulette10,
+    Roulette11,
+    Roulette12,
+    Roulette13,
+    Roulette14,
+    Roulette15,
+    Roulette16,
+    Roulette17,
+    Roulette18,
+    Roulette19,
+    Roulette20,
+    Roulette21,
+    Roulette22,
+    Roulette23,
+    Roulette24,
+    Roulette25,
+    Roulette26,
+    Roulette27,
+    Roulette28,
+    Roulette29,
+    Roulette30,
+    Roulette31,
+    Roulette32,
+    Roulette33,
+    Roulette34,
+    Roulette35,
+    Roulette36,
+    Roulette0,
+    Roulette00,
+    Limo,
+    WeaponAlien,
+    RaceOpenWheel,
+    Rappel,
+    SwapCar,
+    ScubaGear,
+    Cpanel1,
+    Cpanel2,
+    Cpanel3,
+    Cpanel4,
+    SnowTruck,
+    Buggy1,
+    Buggy2,
+    Zhaba,
+    Gerald,
+    Ron,
+    Arcade,
+    DroneControls,
+    RCTank,
+    Stairs,
+    Camera2,
+    Winky,
+    MiniSub,
+    KartRetro,
+    KartModern,
+    MilitaryQuad,
+    MilitaryTruck,
+    ShipWheel,
+    UFO,
+    Seasparrow2,
+    Dinghy2,
+    PatrolBoat,
+    RetroSportsCar,
+    Squadee,
+    FoldingWingJet,
+    Valkyrie2,
+    Sub2,
+    BoltCutters,
+    RappelGear,
+    KeyCard,
+    Password,
+    IslandHeistPrep,
+    IslandParty,
+    ControlTower,
+    UnderwaterGate,
+    PowerSwitch,
+    CompoundGate,
+    RappelPoint,
+    KeyPad,
+    SubControls,
+    SubPeriscope,
+    SubMissile,
+    Painting,
+    CarMeet,
+    CarTestArea,
+    AutoShopProperty,
+    DocksExport,
+    PrizeCar,
+    TestCar,
+    CarRobberyBoard,
+    CarRobberyPrep,
+    StreetRaceSeries,
+    PursuitSeries,
+    CarMeetOrganiser,
+    SecuroServ,
+    BountyCollectibles,
+    MovieCollectibles,
+    TrailerRamp,
+    RaceOrganiser,
+    ChalkboardList,
+    ExportVehicle,
+    Train,
+    HeistDiamond,
+    HeistDoomsday,
+    HeistIsland,
+    Slamvan2,
+    Crusader,
+    ConstructionOutfit,
+    OverlayJammed,
+    HeistIslandUnavailable,
+    HeistDiamondUnavailable,
+    HeistDoomsdayUnavailable,
+    Placeholder7,
+    Placeholder8,
+    Placeholder9,
+    FeaturedSeries,
+    VehicleForSale,
+    VanKeys,
+    SuvService,
+    SecurityContract,
+    Safe,
+    PedR,
+    PedE,
+    Payphone,
+    Patriot3,
+    MusicStudio,
+    Jubilee,
+    Granger2,
+    ExplosiveCharge,
+    Deity,
+    DChampion,
+    Buffalo4,
+    Agency,
   }
 
   export const enum BlipColor {
@@ -673,6 +834,21 @@ declare module "alt-shared" {
     TransparentRed = 79,
     TransparentBlue = 80,
     Purple = 83,
+  }
+
+  export const enum BlipType {
+    Vehicle = 1,
+    Ped,
+    Object,
+    Destination,
+    Cont,
+    PickupUnk,
+    Radius,
+    Pickup,
+    Cop,
+    Area,
+    Gallery,
+    PickupObject,
   }
 
   export const enum MarkerType {
@@ -733,7 +909,7 @@ declare module "alt-shared" {
     Polygon,
   }
 
-  export const enum AudioCategory {
+  export const enum AudioCategories {
     x44E21C90 = "0x44E21C90",
     xBAD598C7 = "0xBAD598C7",
     xA4D158B0 = "0xA4D158B0",
@@ -1490,18 +1666,25 @@ declare module "alt-shared" {
     DontChangeTargetFromMelee = 458,
   }
 
+  /** @beta */
+  export const enum VoiceConnectionState {
+    Disconnected,
+    Connecting,
+    Connected,
+  }
+
   /**
    * Documentation: https://docs.altv.mp/articles/configs/resource.html
    */
   export interface IResourceConfig {
     readonly type?: string;
-    readonly deps?: ReadonlyArray<string>;
+    readonly deps?: readonly string[];
     readonly main?: string;
     readonly "client-main"?: string;
     readonly "client-type"?: string;
-    readonly "client-files"?: ReadonlyArray<string>;
-    readonly "required-permissions"?: ReadonlyArray<Permission>;
-    readonly "optional-permissions"?: ReadonlyArray<Permission>;
+    readonly "client-files"?: readonly string[];
+    readonly "required-permissions"?: readonly Permission[];
+    readonly "optional-permissions"?: readonly Permission[];
 
     readonly [key: string]: unknown;
   }
@@ -1540,6 +1723,29 @@ declare module "alt-shared" {
     [K in keyof TInterface as Extract<K, string>]: TInterface[K];
   };
 
+  /**
+   * This is an internal utility type and you probably don't need it
+   *
+   * Returns parameters of either built-in alt:V event (`TAltInterface`) or custom event (`TCustomInterface`) by the given `TEventName`
+   *
+   * @hidden
+   */
+  // prettier-ignore
+  export type EventParameters<
+    TAltInterface extends Record<any, any>,
+    TCustomInterface extends Record<any, any>,
+    TEventName extends keyof TAltInterface | keyof TCustomInterface,
+  > = (
+    Parameters<TEventName extends keyof TAltInterface
+      ? TAltInterface[TEventName]
+      : (
+        TEventName extends keyof TCustomInterface
+        ? TCustomInterface[TEventName]
+        : never
+      )
+    >
+  );
+
   export interface IVector2 {
     readonly x: number;
     readonly y: number;
@@ -1552,7 +1758,7 @@ declare module "alt-shared" {
   }
 
   /**
-   * @alpha
+   * @beta
    */
   export interface IQuaternion {
     readonly x: number;
@@ -1564,6 +1770,12 @@ declare module "alt-shared" {
   export interface IResource {
     readonly name: string;
     readonly type: string;
+  }
+
+  export interface IWeapon {
+    readonly hash: number;
+    readonly tintIndex: number;
+    readonly components: readonly number[];
   }
 
   export const enum VehicleLockState {
@@ -1653,7 +1865,7 @@ declare module "alt-shared" {
   export interface ICustomPlayerLocalMeta {}
 
   /**
-   * Extend it by interface merging for use in player synced meta (class `Player` on client & server, e.g. `player.getSyncedMeta`)
+   * Extend it by interface merging for use in vehicle synced meta (class `Vehicle` on client & server, e.g. `vehicle.getSyncedMeta`)
    *
    * @remarks See {@link ICustomGlobalMeta} for an example of use
    */
@@ -1672,6 +1884,54 @@ declare module "alt-shared" {
    * @remarks See {@link ICustomGlobalMeta} for an example of use
    */
   export interface ICustomVirtualEntityStreamSyncedMeta {}
+
+  /**
+   * Extend it by interface merging for use in ped synced meta (class `Ped` on client & server, e.g. `ped.getSyncedMeta`)
+   *
+   * @remarks See {@link ICustomGlobalMeta} for an example of use
+   */
+  export interface ICustomPedSyncedMeta extends ICustomEntitySyncedMeta {}
+
+  /**
+   * Extend it by interface merging for use in ped stream synced meta (class `Ped` on client & server, e.g. `ped.getStreamSyncedMeta`)
+   *
+   * @remarks See {@link ICustomGlobalMeta} for an example of use
+   */
+  export interface ICustomPedStreamSyncedMeta extends ICustomEntityStreamSyncedMeta {}
+
+  /**
+   * Extend `alt.emitServer` and `alt.onServer` auto-completion by merging interfaces.
+   *
+   * @example
+   * ```ts
+   * declare module 'alt-client' {
+   *    interface ICustomServerClientEvent {
+   *        myEvent: (arg1: string, arg2: { key: string, value: number })
+   *    }
+   * }
+   * ```
+   *
+   * @export
+   * @interface ICustomServerClientEvent
+   */
+  export interface ICustomServerClientEvent {}
+
+  /**
+   * Extend `alt.onClient` and `alt.emitServer` auto-completion by merging interfaces.
+   *
+   * @example
+   * ```ts
+   * declare module 'alt-client' {
+   *    interface ICustomClientServerEvent {
+   *        myEvent: (arg1: string, arg2: { key: string, value: number })
+   *    }
+   * }
+   * ```
+   *
+   * @export
+   * @interface ICustomClientServerEvent
+   */
+  export interface ICustomClientServerEvent {}
 
   export interface IInspectOptions {
     /**
@@ -2144,7 +2404,7 @@ declare module "alt-shared" {
   }
 
   /**
-   * @alpha
+   * @beta
    */
   export class Quaternion {
     public readonly x: number;
@@ -2303,7 +2563,7 @@ declare module "alt-shared" {
     public hasMeta(key: string): boolean;
     public hasMeta<K extends ExtractStringKeys<ICustomBaseObjectMeta>>(key: K): boolean;
 
-    public getMetaDataKeys(): ReadonlyArray<string>;
+    public getMetaDataKeys(): readonly string[];
 
     /**
      * Stores the given value with the specified key.
@@ -2338,7 +2598,7 @@ declare module "alt-shared" {
     public hasSyncedMeta(key: string): boolean;
     public hasSyncedMeta<K extends ExtractStringKeys<ICustomBaseObjectSyncedMeta>>(key: K): boolean;
 
-    public getSyncedMetaKeys(): ReadonlyArray<string>;
+    public getSyncedMetaKeys(): readonly string[];
 
     /**
      * Returns the ref count of the entity.
@@ -2379,6 +2639,16 @@ declare module "alt-shared" {
    */
   export const debug: boolean;
 
+  /**
+   * Default dimension (0). Read more: https://docs.altv.mp/articles/dimensions.html
+   */
+  export const defaultDimension: number;
+
+  /**
+   * Global dimension (-2147483648). Read more: https://docs.altv.mp/articles/dimensions.html
+   */
+  export const globalDimension: number;
+
   // "V" generic overloads in get & set meta methods remain only for backward compatibility
   // TODO: remove "V" generic overloads from all get & set meta methods (alt.getMeta, alt.Entity.getSyncedMeta, etc.)
   /**
@@ -2402,9 +2672,9 @@ declare module "alt-shared" {
 
   /**
    * Returns all meta keys which have been set
-   * @alpha
+   * @beta
    */
-  export function getMetaKeys(): ReadonlyArray<string>;
+  export function getMetaKeys(): readonly string[];
 
   /**
    * Determines whether contains the specified key.
@@ -2441,9 +2711,9 @@ declare module "alt-shared" {
 
   /**
    * Returns all synced meta keys which have been set
-   * @alpha
+   * @beta
    */
-  export function getSyncedMetaKeys(): ReadonlyArray<string>;
+  export function getSyncedMetaKeys(): readonly string[];
 
   /**
    * Determines whether contains the specified key.
@@ -2644,7 +2914,7 @@ declare module "alt-shared" {
    */
   export const isServer: boolean;
 
-  export function getAllResources(): ReadonlyArray<IResource>;
+  export function getAllResources(): readonly IResource[];
 
   export function time(timerName: string): void;
 
@@ -2662,15 +2932,15 @@ declare module "alt-shared" {
     public readonly name: string;
     public readonly main: string;
     public readonly exports: Record<string, any>;
-    public readonly dependencies: ReadonlyArray<string>;
-    public readonly dependants: ReadonlyArray<string>;
-    public readonly requiredPermissions: ReadonlyArray<Permission>;
-    public readonly optionalPermissions: ReadonlyArray<Permission>;
+    public readonly dependencies: readonly string[];
+    public readonly dependants: readonly string[];
+    public readonly requiredPermissions: readonly Permission[];
+    public readonly optionalPermissions: readonly Permission[];
     public readonly valid: boolean;
 
     public readonly config: IResourceConfig;
     public static getByName(name: string): Resource | null;
-    public static readonly all: ReadonlyArray<Resource>;
+    public static readonly all: readonly Resource[];
     public static readonly current: Resource;
   }
 
@@ -2737,7 +3007,15 @@ declare module "alt-shared" {
    * @param eventName Name of the event or null for generic event.
    * @returns Array of listener functions for that event.
    */
-  export function getEventListeners(eventName: string | null): ((...args: any[]) => void)[];
+  export function getEventListeners(eventName: string | null): readonly ((...args: any[]) => void)[];
 
   export function stringToSHA256(string: string): string;
+
+  /** @beta */
+  export function getVoiceConnectionState(): VoiceConnectionState;
+
+  /**
+   * Gets the amount of milliseconds since the server was started.
+   */
+  export function getNetTime(): number;
 }

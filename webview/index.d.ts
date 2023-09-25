@@ -40,6 +40,15 @@ interface Alt {
    * @returns Array of listener functions for that event.
    */
   getEventListeners(eventName: string): ((...args: any[]) => void)[];
+
+  /** @beta */
+  getVersion(): string;
+
+  /** @beta */
+  getBranch(): string;
+
+  /** @beta */
+  getLocale(): string;
 }
 
 interface Window {
